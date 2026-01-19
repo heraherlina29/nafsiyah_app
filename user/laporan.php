@@ -86,574 +86,167 @@ $laporan = $stmt->fetchAll();
 include 'templates/header.php';
 ?>
 
-<style>
-:root {
-    --primary-50: #f0f9ff;
-    --primary-100: #e0f2fe;
-    --primary-200: #bae6fd;
-    --primary-300: #7dd3fc;
-    --primary-400: #38bdf8;
-    --primary-500: #0ea5e9;
-    --primary-600: #0284c7;
-    --primary-700: #0369a1;
-    --secondary-50: #fefce8;
-    --secondary-100: #fef9c3;
-    --secondary-200: #fef08a;
-    --secondary-300: #fde047;
-    --secondary-400: #facc15;
-    --green-50: #f0fdf4;
-    --green-100: #dcfce7;
-    --green-200: #bbf7d0;
-    --green-400: #4ade80;
-    --green-500: #22c55e;
-    --green-600: #16a34a;
-    --gray-50: #f9fafb;
-    --gray-100: #f3f4f6;
-    --gray-200: #e5e7eb;
-    --gray-300: #d1d5db;
-    --gray-800: #1f2937;
-    --gray-900: #111827;
-    --rose-50: #fff1f2;
-    --rose-100: #ffe4e6;
-    --rose-200: #fecdd3;
-    --rose-300: #fda4af;
-    --rose-400: #fb7185;
-    --rose-500: #f43f5e;
-    --rose-600: #e11d48;
-    --rose-700: #be123c;
-}
+<!-- Container Utama -->
+<div class="max-w-5xl mx-auto space-y-6">
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-}
-
-body {
-    background: linear-gradient(135deg, var(--primary-50) 0%, #f8fafc 100%);
-    min-height: 100vh;
-    padding: 16px;
-    color: var(--gray-900);
-}
-
-@media (min-width: 768px) {
-    body {
-        padding: 20px;
-    }
-}
-
-.container {
-    max-width: 100%;
-    margin: 0 auto;
-}
-
-@media (min-width: 640px) {
-    .container {
-        max-width: 600px;
-    }
-}
-
-@media (min-width: 768px) {
-    .container {
-        max-width: 750px;
-    }
-}
-
-@media (min-width: 1024px) {
-    .container {
-        max-width: 800px;
-    }
-}
-
-/* Header */
-.user-header {
-    background: white;
-    border-radius: 24px;
-    padding: 24px;
-    margin-bottom: 24px;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
-    border: 1px solid var(--gray-200);
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    background: linear-gradient(135deg, white, #f8fafc);
-    position: relative;
-    overflow: hidden;
-}
-
-@media (min-width: 768px) {
-    .user-header {
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-    }
-}
-
-.user-header::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, var(--primary-400), var(--green-500));
-}
-
-.user-info {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-}
-
-.user-avatar {
-    width: 64px;
-    height: 64px;
-    background: linear-gradient(135deg, var(--primary-400), var(--green-400));
-    border-radius: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 1.5rem;
-    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.2);
-}
-
-.user-text h1 {
-    color: var(--gray-900);
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin-bottom: 4px;
-}
-
-.user-text .level {
-    color: var(--primary-600);
-    font-size: 0.875rem;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.user-stats {
-    display: flex;
-    gap: 12px;
-    width: 100%;
-    justify-content: space-between;
-}
-
-@media (min-width: 768px) {
-    .user-stats {
-        width: auto;
-        gap: 20px;
-        justify-content: flex-end;
-    }
-}
-
-.stat-box {
-    text-align: center;
-    padding: 8px 12px;
-    background: var(--primary-50);
-    border-radius: 12px;
-    min-width: 80px;
-}
-
-.stat-value {
-    font-size: 1.25rem;
-    font-weight: 800;
-    color: var(--primary-600);
-}
-
-.stat-label {
-    font-size: 0.7rem;
-    color: var(--gray-800);
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-/* Back Button */
-.back-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 20px;
-    background: var(--primary-100);
-    color: var(--primary-700);
-    border: 2px solid var(--primary-300);
-    border-radius: 16px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 0.875rem;
-    transition: all 0.3s ease;
-    margin-bottom: 20px;
-}
-
-.back-btn:hover {
-    background: var(--primary-200);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.2);
-}
-
-/* Chart Card */
-.chart-card {
-    background: white;
-    border-radius: 24px;
-    padding: 24px;
-    margin-bottom: 24px;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
-    border: 1px solid var(--gray-200);
-    background: linear-gradient(135deg, white, #f8fafc);
-}
-
-@media (min-width: 768px) {
-    .chart-card {
-        padding: 32px;
-    }
-}
-
-.chart-header {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    margin-bottom: 24px;
-}
-
-@media (min-width: 768px) {
-    .chart-header {
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-    }
-}
-
-.chart-title {
-    font-size: 1.25rem;
-    font-weight: 800;
-    color: var(--gray-900);
-}
-
-.chart-filters {
-    display: inline-flex;
-    background: var(--gray-50);
-    padding: 6px;
-    border-radius: 12px;
-    border: 1px solid var(--gray-200);
-    gap: 4px;
-}
-
-.filter-btn {
-    padding: 8px 16px;
-    border: none;
-    border-radius: 8px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--gray-600);
-    background: transparent;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    display: inline-block;
-}
-
-.filter-btn.active {
-    background: linear-gradient(135deg, var(--primary-500), var(--green-500));
-    color: white;
-    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.2);
-}
-
-.filter-btn:not(.active):hover {
-    background: var(--gray-100);
-    color: var(--gray-900);
-}
-
-.chart-container {
-    height: 300px;
-    position: relative;
-}
-
-/* Detail Report Card */
-.detail-card {
-    background: white;
-    border-radius: 24px;
-    padding: 0;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
-    border: 1px solid var(--gray-200);
-    overflow: hidden;
-}
-
-.detail-header {
-    background: linear-gradient(135deg, var(--primary-50), var(--primary-100));
-    padding: 24px;
-    border-bottom: 1px solid var(--gray-200);
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
-@media (min-width: 768px) {
-    .detail-header {
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-    }
-}
-
-.detail-title h3 {
-    font-size: 1.25rem;
-    font-weight: 800;
-    color: var(--gray-900);
-    margin-bottom: 4px;
-}
-
-.detail-title p {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--primary-600);
-}
-
-.date-navigation {
-    display: flex;
-    gap: 8px;
-}
-
-.date-btn {
-    width: 44px;
-    height: 44px;
-    background: white;
-    border: 1px solid var(--gray-200);
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--gray-600);
-    text-decoration: none;
-    transition: all 0.3s ease;
-}
-
-.date-btn:hover {
-    border-color: var(--primary-300);
-    color: var(--primary-600);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-}
-
-.detail-content {
-    padding: 24px;
-}
-
-.report-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.report-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 16px;
-    background: var(--gray-50);
-    border: 1px solid var(--gray-200);
-    border-radius: 16px;
-    transition: all 0.3s ease;
-}
-
-.report-item:hover {
-    border-color: var(--primary-300);
-    background: var(--primary-50);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-}
-
-.report-info {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.report-number {
-    width: 36px;
-    height: 36px;
-    background: linear-gradient(135deg, var(--gray-900), var(--gray-800));
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 0.875rem;
-    font-weight: 800;
-    flex-shrink: 0;
-}
-
-.report-name {
-    font-size: 0.875rem;
-    font-weight: 700;
-    color: var(--gray-900);
-}
-
-.report-status {
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-.status-selesai {
-    background: linear-gradient(135deg, var(--green-50), var(--green-100));
-    color: var(--green-700);
-    border: 1px solid var(--green-200);
-}
-
-.status-sebagian {
-    background: linear-gradient(135deg, var(--secondary-50), var(--secondary-100));
-    color: var(--secondary-700);
-    border: 1px solid var(--secondary-200);
-}
-
-.status-absen {
-    background: linear-gradient(135deg, var(--rose-50), var(--rose-100));
-    color: var(--rose-700);
-    border: 1px solid var(--rose-200);
-}
-
-/* Animations */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.fade-in {
-    animation: fadeIn 0.6s ease-out forwards;
-}
-
-.delay-1 { animation-delay: 0.1s; }
-.delay-2 { animation-delay: 0.2s; }
-</style>
-
-<div class="container">
-    <!-- Header User -->
-    <div class="user-header fade-in">
-        <div class="user-info">
-            <div class="user-avatar">
-                <i class="fas fa-chart-bar"></i>
-            </div>
-            <div class="user-text">
-                <h1><?= htmlspecialchars($userData['username']) ?></h1>
-                <div class="level">
-                    <i class="fas fa-medal" style="color: var(--secondary-400);"></i>
-                    <span>Level <?= $level['lv'] ?> - <?= $level['nama'] ?></span>
+    <!-- Header User Card (Simplified for History Page) -->
+    <div class="relative bg-white rounded-3xl p-6 shadow-sm border border-slate-200 overflow-hidden dark:bg-dark-surface dark:border-dark-surface2">
+        <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary-400 to-green-500"></div>
+        <div class="flex items-center justify-between relative z-10">
+            <div class="flex items-center gap-4">
+                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center text-2xl text-primary-600 shadow-inner dark:bg-primary-900/20 dark:text-primary-400">
+                    <i class="fas fa-chart-pie"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-slate-800 dark:text-white">Riwayat Progres</h1>
+                    <p class="text-sm font-medium text-slate-500 dark:text-slate-400">Analisis perjalanan ibadahmu</p>
                 </div>
             </div>
-        </div>
-        <div class="user-stats">
-            <div class="stat-box">
-                <div class="stat-value"><?= date('d/m/Y') ?></div>
-                <div class="stat-label">Hari Ini</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-value">🔥 <?= $userData['streak_count'] ?></div>
-                <div class="stat-label">Streak</div>
-            </div>
+            
+            <!-- Tombol Kembali -->
+            <a href="dashboard.php" class="hidden sm:inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-primary-600 hover:border-primary-200 transition-all shadow-sm dark:bg-dark-surface2 dark:border-slate-700 dark:text-slate-300 dark:hover:text-white">
+                <i class="fas fa-arrow-left"></i> Kembali
+            </a>
         </div>
     </div>
 
-    <!-- Back Button -->
-    <a href="dashboard.php" class="back-btn fade-in">
-        <i class="fas fa-arrow-left"></i>
-        Kembali ke Dashboard
-    </a>
-
-    <!-- Chart Card -->
-    <div class="chart-card fade-in delay-1">
-        <div class="chart-header">
-            <h2 class="chart-title"><?= $chart_title ?> (%)</h2>
-            <div class="chart-filters">
-                <a href="laporan.php?range=daily" class="filter-btn <?= $range === 'daily' ? 'active' : '' ?>">
-                    Harian
+    <!-- Chart Section -->
+    <div class="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-200 dark:bg-dark-surface dark:border-dark-surface2">
+        <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+            <div>
+                <h2 class="text-lg font-bold text-slate-800 dark:text-white"><?= $chart_title ?></h2>
+                <p class="text-xs text-slate-400 font-medium mt-1">Persentase penyelesaian amalan</p>
+            </div>
+            
+            <!-- Filters -->
+            <div class="flex bg-slate-100 p-1 rounded-xl dark:bg-dark-surface2 border border-slate-200 dark:border-slate-700">
+                <?php 
+                $filters = [
+                    'daily' => 'Harian',
+                    'weekly' => 'Mingguan',
+                    'monthly' => 'Bulanan'
+                ];
+                foreach($filters as $key => $label): 
+                    $isActive = $range === $key;
+                    $activeClass = 'bg-white text-primary-600 shadow-sm dark:bg-slate-700 dark:text-white';
+                    $inactiveClass = 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200';
+                ?>
+                <a href="laporan.php?range=<?= $key ?>" class="px-4 py-2 rounded-lg text-xs font-bold transition-all <?= $isActive ? $activeClass : $inactiveClass ?>">
+                    <?= $label ?>
                 </a>
-                <a href="laporan.php?range=weekly" class="filter-btn <?= $range === 'weekly' ? 'active' : '' ?>">
-                    Mingguan
-                </a>
-                <a href="laporan.php?range=monthly" class="filter-btn <?= $range === 'monthly' ? 'active' : '' ?>">
-                    Bulanan
-                </a>
+                <?php endforeach; ?>
             </div>
         </div>
-        <div class="chart-container">
+
+        <div class="relative h-72 w-full">
             <canvas id="chartCanvas"></canvas>
         </div>
     </div>
 
-    <!-- Detail Report Card -->
-    <div class="detail-card fade-in delay-2">
-        <div class="detail-header">
-            <div class="detail-title">
-                <h3>Detail Laporan</h3>
-                <p><?= $tanggal_obj->format('l, d F Y') ?></p>
+    <!-- Detail Laporan Harian -->
+    <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden dark:bg-dark-surface dark:border-dark-surface2">
+        <!-- Header Detail -->
+        <div class="flex flex-col sm:flex-row justify-between items-center p-6 border-b border-slate-100 bg-slate-50/50 dark:bg-dark-surface2/50 dark:border-slate-700 gap-4">
+            <div class="text-center sm:text-left">
+                <h3 class="text-lg font-bold text-slate-800 dark:text-white">Detail Laporan</h3>
+                <p class="text-sm font-semibold text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20 px-3 py-1 rounded-lg mt-2 inline-block">
+                    <i class="far fa-calendar-alt mr-2"></i> <?= $tanggal_obj->format('l, d F Y') ?>
+                </p>
             </div>
-            <div class="date-navigation">
-                <a href="laporan.php?range=<?= $range ?>&tanggal=<?= $tanggal_kemarin ?>" class="date-btn">
+            
+            <!-- Navigasi Tanggal -->
+            <div class="flex items-center gap-2">
+                <a href="laporan.php?range=<?= $range ?>&tanggal=<?= $tanggal_kemarin ?>" class="w-10 h-10 flex items-center justify-center rounded-xl border border-slate-200 text-slate-500 hover:bg-white hover:text-primary-600 hover:shadow-md hover:border-primary-200 transition-all bg-white dark:bg-dark-surface dark:border-slate-700 dark:text-slate-400 dark:hover:text-white">
                     <i class="fas fa-chevron-left"></i>
                 </a>
-                <a href="laporan.php?range=<?= $range ?>&tanggal=<?= $tanggal_besok ?>" class="date-btn">
+                <a href="laporan.php?range=<?= $range ?>&tanggal=<?= $tanggal_besok ?>" class="w-10 h-10 flex items-center justify-center rounded-xl border border-slate-200 text-slate-500 hover:bg-white hover:text-primary-600 hover:shadow-md hover:border-primary-200 transition-all bg-white dark:bg-dark-surface dark:border-slate-700 dark:text-slate-400 dark:hover:text-white">
                     <i class="fas fa-chevron-right"></i>
                 </a>
             </div>
         </div>
-        <div class="detail-content">
-            <div class="report-list">
+
+        <!-- List Amalan -->
+        <div class="p-6">
+            <div class="grid gap-3">
                 <?php foreach ($laporan as $item): ?>
                     <?php
                     $status = $item['status'] ?? 'tidak_selesai';
-                    $status_class = 'status-absen';
+                    
+                    // Style berdasarkan status
+                    $itemBg = 'bg-white border-slate-100 hover:border-slate-200 dark:bg-dark-surface dark:border-slate-700';
+                    $iconBg = 'bg-slate-100 text-slate-400 dark:bg-slate-700 dark:text-slate-500';
+                    $statusBadge = 'bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-400';
+                    $statusIcon = 'fa-minus';
+                    $statusText = 'Belum';
+
                     if ($status === 'selesai') {
-                        $status_class = 'status-selesai';
+                        $itemBg = 'bg-green-50/30 border-green-100 hover:border-green-200 dark:bg-green-900/10 dark:border-green-900/30';
+                        $iconBg = 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400';
+                        $statusBadge = 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400';
+                        $statusIcon = 'fa-check';
+                        $statusText = 'Selesai';
                     } elseif ($status === 'sebagian') {
-                        $status_class = 'status-sebagian';
+                        $itemBg = 'bg-amber-50/30 border-amber-100 hover:border-amber-200 dark:bg-amber-900/10 dark:border-amber-900/30';
+                        $iconBg = 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400';
+                        $statusBadge = 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400';
+                        $statusIcon = 'fa-hourglass-half';
+                        $statusText = 'Sebagian';
+                    } elseif ($status === 'tidak_selesai' && !empty($item['status'])) { // Jika ada record tapi statusnya gagal/absen
+                         $itemBg = 'bg-rose-50/30 border-rose-100 hover:border-rose-200 dark:bg-rose-900/10 dark:border-rose-900/30';
+                         $iconBg = 'bg-rose-100 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400';
+                         $statusBadge = 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400';
+                         $statusIcon = 'fa-times';
+                         $statusText = 'Absen';
                     }
                     ?>
-                    <div class="report-item">
-                        <div class="report-info">
-                            <div class="report-number">
+                    <div class="flex items-center justify-between p-4 rounded-2xl border transition-all group <?= $itemBg ?>">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold <?= $iconBg ?>">
                                 <?= $item['urutan'] ?>
                             </div>
-                            <div class="report-name">
-                                <?= htmlspecialchars($item['activity_name']) ?>
+                            <div>
+                                <div class="font-bold text-slate-800 text-sm md:text-base dark:text-white">
+                                    <?= htmlspecialchars($item['activity_name']) ?>
+                                </div>
+                                <?php if (!empty($item['catatan']) && $item['catatan'] !== $statusText): ?>
+                                    <div class="text-xs text-slate-500 mt-0.5 italic dark:text-slate-400">
+                                        "<?= htmlspecialchars($item['catatan']) ?>"
+                                    </div>
+                                <?php endif; ?>
                             </div>
                         </div>
-                        <div class="report-status <?= $status_class ?>">
-                            <?php
-                            if ($status === 'selesai') {
-                                echo 'Selesai';
-                            } elseif ($status === 'sebagian') {
-                                echo 'Sebagian';
-                            } else {
-                                echo 'Absen';
-                            }
-                            ?>
+                        
+                        <div class="px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center gap-2 <?= $statusBadge ?>">
+                            <i class="fas <?= $statusIcon ?>"></i>
+                            <span class="hidden sm:inline"><?= $statusText ?></span>
                         </div>
                     </div>
                 <?php endforeach; ?>
             </div>
         </div>
     </div>
+
 </div>
 
+<!-- Script Chart JS -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const ctx = document.getElementById('chartCanvas').getContext('2d');
+    const ctx = document.getElementById('chartCanvas');
+    if(!ctx) return;
+
+    // Deteksi Dark Mode
+    const isDarkMode = document.documentElement.classList.contains('dark');
+    const textColor = isDarkMode ? '#94a3b8' : '#64748b';
+    const gridColor = isDarkMode ? '#334155' : '#f1f5f9';
     
-    // Create gradient
-    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-    gradient.addColorStop(0, 'rgba(14, 165, 233, 0.8)');
-    gradient.addColorStop(1, 'rgba(14, 165, 233, 0.1)');
+    // Gradient Context (UPDATED TO PURPLE)
+    const ctx2d = ctx.getContext('2d');
+    const gradient = ctx2d.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, 'rgba(168, 85, 247, 0.5)'); // Purple 500 opacity
+    gradient.addColorStop(1, 'rgba(168, 85, 247, 0.05)');
     
-    const chart = new Chart(ctx, {
+    new Chart(ctx, {
         type: 'bar',
         data: {
             labels: <?= json_encode($chart_labels) ?>,
@@ -661,11 +254,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 label: 'Penyelesaian %',
                 data: <?= json_encode($chart_data) ?>,
                 backgroundColor: gradient,
-                borderColor: 'var(--primary-500)',
+                borderColor: '#a855f7', // Purple 500
                 borderWidth: 2,
-                borderRadius: 12,
+                borderRadius: 8,
                 borderSkipped: false,
-                barPercentage: 0.6
+                barPercentage: 0.6,
+                hoverBackgroundColor: '#9333ea' // Purple 600
             }]
         },
         options: {
@@ -674,7 +268,7 @@ document.addEventListener('DOMContentLoaded', function() {
             plugins: {
                 legend: { display: false },
                 tooltip: {
-                    backgroundColor: 'rgba(31, 41, 55, 0.9)',
+                    backgroundColor: '#1e293b',
                     titleFont: { size: 12 },
                     bodyFont: { size: 13, weight: '600' },
                     padding: 12,
@@ -690,52 +284,26 @@ document.addEventListener('DOMContentLoaded', function() {
                 y: {
                     beginAtZero: true,
                     max: 100,
-                    ticks: {
-                        font: { size: 11, weight: '600' },
-                        color: 'var(--gray-600)',
-                        callback: function(value) {
-                            return value + '%';
-                        }
-                    },
-                    grid: {
-                        color: 'var(--gray-100)'
+                    grid: { color: gridColor },
+                    ticks: { 
+                        font: { size: 11 },
+                        color: textColor,
+                        callback: function(value) { return value + '%' }
                     }
                 },
                 x: {
-                    ticks: {
-                        font: { size: 11, weight: '600' },
-                        color: 'var(--gray-600)'
-                    },
-                    grid: {
-                        display: false
+                    grid: { display: false },
+                    ticks: { 
+                        font: { size: 11 },
+                        color: textColor
                     }
                 }
-            },
-            interaction: {
-                intersect: false,
-                mode: 'index'
             },
             animation: {
                 duration: 1000,
                 easing: 'easeOutQuart'
             }
         }
-    });
-    
-    // Add hover effects to report items
-    const reportItems = document.querySelectorAll('.report-item');
-    reportItems.forEach(item => {
-        item.addEventListener('mouseenter', () => {
-            item.style.transform = 'translateY(-2px)';
-        });
-        item.addEventListener('mouseleave', () => {
-            item.style.transform = 'translateY(0)';
-        });
-    });
-    
-    // Responsive chart adjustments
-    window.addEventListener('resize', function() {
-        chart.resize();
     });
 });
 </script>

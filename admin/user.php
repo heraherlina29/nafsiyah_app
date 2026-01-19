@@ -17,8 +17,8 @@ $params = [];
 
 if (!empty($search_query)) {
     $where_clauses[] = "(nama_lengkap LIKE ? OR username LIKE ? OR email LIKE ?)";
-    $params[] = "%$search_query%"; 
-    $params[] = "%$search_query%"; 
+    $params[] = "%$search_query%";
+    $params[] = "%$search_query%";
     $params[] = "%$search_query%";
 }
 if (!empty($status_filter)) {
@@ -52,225 +52,175 @@ $start_number = ($total_data > 0) ? $offset + 1 : 0;
 $end_number = min($offset + $limit_per_halaman, $total_data);
 ?>
 
-<!-- Tambahkan CSS inline untuk tema ungu -->
-<style>
-    :root {
-        --primary-purple: #7c3aed;
-        --primary-purple-light: #8b5cf6;
-        --primary-purple-dark: #5b21b6;
-        --light-purple: #f5f3ff;
-        --accent-teal: #0d9488;
-        --accent-pink: #db2777;
-        --gray-light: #f8fafc;
-        --gray-border: #e2e8f0;
-        --text-dark: #1e293b;
-        --text-light: #64748b;
-    }
-    
-    .btn-primary {
-        background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-purple-light) 100%);
-        color: white;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 12px rgba(124, 58, 237, 0.2);
-    }
-    
-    .btn-primary:hover {
-        background: linear-gradient(135deg, var(--primary-purple-dark) 0%, var(--primary-purple) 100%);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 16px rgba(124, 58, 237, 0.3);
-    }
-    
-    .btn-secondary {
-        background: var(--gray-light);
-        color: var(--text-light);
-        border: 1px solid var(--gray-border);
-    }
-    
-    .btn-secondary:hover {
-        background: white;
-        color: var(--primary-purple);
-        border-color: var(--primary-purple);
-    }
-    
-    .status-active {
-        background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
-        color: white;
-    }
-    
-    .status-inactive {
-        background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
-        color: white;
-    }
-    
-    .table-header {
-        background: var(--light-purple);
-        color: var(--primary-purple);
-    }
-    
-    .table-row:hover {
-        background: var(--light-purple);
-    }
-    
-    .avatar-purple {
-        background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-purple-light) 100%);
-        color: white;
-    }
-    
-    .input-focus:focus {
-        border-color: var(--primary-purple);
-        box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
-    }
-    
-    .pagination-active {
-        background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-purple-light) 100%);
-        color: white;
-    }
-</style>
+<div class="max-w-7xl mx-auto space-y-8 font-sans">
 
-<div class="px-8 py-8 max-w-[1400px] mx-auto">
-    <div class="mb-8 flex justify-between items-end">
+    <!-- Page Header -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-            <h2 class="text-[10px] font-bold tracking-[0.2em] text-gray-400 uppercase mb-1">ADMIN <span class="text-purple-600">DASHBOARD</span></h2>
-            <h1 class="text-3xl font-bold text-gray-800">Kelola Pengguna</h1>
-            <p class="text-sm text-gray-400 mt-2">Kelola data pengguna dengan mudah dan efisien</p>
+            <h1 class="text-2xl font-black text-slate-800 dark:text-white">Kelola Pengguna</h1>
+            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Manajemen akun dan data pengguna aplikasi</p>
         </div>
         <button type="button" id="openModalBtn"
-            class="btn-primary inline-flex items-center px-6 py-3 text-sm font-semibold rounded-xl transition-all uppercase tracking-wide">
-            <i class="fas fa-plus mr-2"></i> Tambah Pengguna Baru
+            class="inline-flex items-center gap-2 px-5 py-2.5 bg-primary-600 text-white text-sm font-bold rounded-xl hover:bg-primary-700 transition-all shadow-lg shadow-primary-500/30">
+            <i class="fas fa-plus"></i> Tambah Pengguna
         </button>
     </div>
 
-    <!-- Card Filter -->
-    <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm mb-8">
-        <h3 class="text-sm font-semibold text-gray-700 mb-4">Filter & Pencarian</h3>
+    <!-- Filter Section -->
+    <div
+        class="bg-white rounded-3xl p-6 shadow-soft border border-slate-100 dark:bg-dark-surface dark:border-dark-surface2">
         <form action="user.php" method="GET" class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
             <div class="md:col-span-6">
-                <label class="block text-xs font-medium text-gray-600 mb-2">Cari Pengguna</label>
+                <label
+                    class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 dark:text-slate-400">Pencarian</label>
                 <div class="relative">
-                    <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                    <input type="text" name="search" placeholder="Cari berdasarkan nama, email, atau username..." 
-                           value="<?= htmlspecialchars($search_query) ?>"
-                           class="input-focus w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none text-sm placeholder:text-gray-400">
+                    <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    <input type="text" name="search" placeholder="Nama, email, atau username..."
+                        value="<?= htmlspecialchars($search_query) ?>"
+                        class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-all dark:bg-dark-surface2 dark:border-slate-700 dark:text-white dark:focus:ring-primary-900">
                 </div>
             </div>
-            <div class="md:col-span-3">
-                <label class="block text-xs font-medium text-gray-600 mb-2">Status</label>
-                <select name="status" class="input-focus w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none text-sm text-gray-700 cursor-pointer">
+            <div class="md:col-span-4">
+                <label
+                    class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 dark:text-slate-400">Status
+                    Akun</label>
+                <select name="status"
+                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-all dark:bg-dark-surface2 dark:border-slate-700 dark:text-white dark:focus:ring-primary-900">
                     <option value="">Semua Status</option>
                     <option value="aktif" <?= $status_filter == 'aktif' ? 'selected' : '' ?>>Aktif</option>
-                    <option value="tidak_aktif" <?= $status_filter == 'tidak_aktif' ? 'selected' : '' ?>>Tidak Aktif</option>
+                    <option value="tidak_aktif" <?= $status_filter == 'tidak_aktif' ? 'selected' : '' ?>>Tidak Aktif
+                    </option>
                 </select>
             </div>
-            <div class="md:col-span-3 flex gap-2">
-                <button type="submit" class="btn-primary flex-1 px-6 py-3 rounded-xl text-sm font-semibold">
-                    <i class="fas fa-filter mr-2"></i> Filter
+            <div class="md:col-span-2 flex gap-2">
+                <button type="submit"
+                    class="flex-1 px-4 py-3 bg-slate-800 text-white text-sm font-bold rounded-xl hover:bg-slate-700 transition-all dark:bg-slate-700 dark:hover:bg-slate-600">
+                    Filter
                 </button>
-                <a href="user.php" class="btn-secondary w-12 flex items-center justify-center rounded-xl hover:shadow transition-all">
+                <a href="user.php"
+                    class="px-4 py-3 bg-slate-100 text-slate-600 rounded-xl hover:bg-slate-200 transition-all dark:bg-dark-surface2 dark:text-slate-400 dark:hover:bg-slate-700"
+                    title="Reset">
                     <i class="fas fa-sync-alt"></i>
                 </a>
             </div>
         </form>
     </div>
 
-    <!-- Tabel Pengguna -->
-    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+    <!-- Data Table -->
+    <div
+        class="bg-white rounded-3xl shadow-soft border border-slate-100 overflow-hidden dark:bg-dark-surface dark:border-dark-surface2">
         <div class="overflow-x-auto">
-            <table class="w-full">
-                <thead>
-                    <tr class="table-header">
-                        <th class="px-6 py-4 text-xs font-semibold uppercase tracking-wider border-b border-purple-100">Pengguna</th>
-                        <th class="px-6 py-4 text-xs font-semibold uppercase tracking-wider border-b border-purple-100 text-center">Status</th>
-                        <th class="px-6 py-4 text-xs font-semibold uppercase tracking-wider border-b border-purple-100">Username</th>
-                        <th class="px-6 py-4 text-xs font-semibold uppercase tracking-wider border-b border-purple-100 text-right">Aksi</th>
+            <table class="w-full text-left text-sm text-slate-600 dark:text-slate-400">
+                <thead
+                    class="bg-slate-50 text-xs uppercase font-bold text-slate-400 dark:bg-dark-surface2 dark:text-slate-500">
+                    <tr>
+                        <th class="px-6 py-4">Pengguna</th>
+                        <th class="px-6 py-4 text-center">Status</th>
+                        <th class="px-6 py-4">Username</th>
+                        <th class="px-6 py-4">Bergabung</th>
+                        <th class="px-6 py-4 text-right">Aksi</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
                     <?php if (empty($users)): ?>
                         <tr>
-                            <td colspan="4" class="px-6 py-12 text-center">
-                                <div class="flex flex-col items-center">
-                                    <i class="fas fa-users text-4xl text-gray-300 mb-4"></i>
-                                    <p class="text-gray-400 font-medium">Data pengguna tidak ditemukan.</p>
-                                    <p class="text-sm text-gray-300 mt-1">Coba gunakan kata kunci pencarian yang berbeda</p>
+                            <td colspan="5" class="px-6 py-12 text-center">
+                                <div class="flex flex-col items-center justify-center">
+                                    <div
+                                        class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center text-slate-300 mb-4 dark:bg-dark-surface2 dark:text-slate-600">
+                                        <i class="fas fa-users-slash text-2xl"></i>
+                                    </div>
+                                    <p class="text-slate-500 font-medium dark:text-slate-400">Data pengguna tidak ditemukan
+                                    </p>
+                                    <p class="text-xs text-slate-400 mt-1 dark:text-slate-500">Coba ubah kata kunci
+                                        pencarian atau filter</p>
                                 </div>
                             </td>
                         </tr>
-                    <?php endif; ?>
-
-                    <?php foreach ($users as $user): ?>
-                    <tr class="table-row transition-colors border-b border-gray-50 last:border-b-0">
-                        <td class="px-6 py-4">
-                            <div class="flex items-center">
-                                <div class="avatar-purple w-10 h-10 rounded-full flex items-center justify-center font-bold mr-4 shadow-sm">
-                                    <?= strtoupper(substr($user['nama_lengkap'], 0, 1)) ?>
-                                </div>
-                                <div>
-                                    <div class="text-sm font-semibold text-gray-800"><?= htmlspecialchars($user['nama_lengkap']) ?></div>
-                                    <div class="text-xs text-gray-500"><?= htmlspecialchars($user['email']) ?></div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 text-center">
-                            <?php if ($user['status'] == 'aktif'): ?>
-                                <span class="status-active inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold shadow-sm">
-                                    <i class="fas fa-circle mr-1.5 text-[8px]"></i> Aktif
-                                </span>
-                            <?php else: ?>
-                                <span class="status-inactive inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold shadow-sm">
-                                    <i class="fas fa-circle mr-1.5 text-[8px]"></i> Tidak Aktif
-                                </span>
-                            <?php endif; ?>
-                        </td>
-                        <td class="px-6 py-4">
-                            <div class="flex items-center">
-                                <span class="text-sm text-gray-700 bg-gray-100 px-3 py-1 rounded-lg">
+                    <?php else: ?>
+                        <?php foreach ($users as $user): ?>
+                            <tr class="hover:bg-slate-50/50 transition-colors dark:hover:bg-dark-surface2/50 group">
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <div
+                                            class="w-10 h-10 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white font-bold shadow-sm">
+                                            <?= strtoupper(substr($user['nama_lengkap'], 0, 1)) ?>
+                                        </div>
+                                        <div>
+                                            <p
+                                                class="font-bold text-slate-800 dark:text-white group-hover:text-primary-600 transition-colors">
+                                                <?= htmlspecialchars($user['nama_lengkap']) ?></p>
+                                            <p class="text-[10px] text-slate-400"><?= htmlspecialchars($user['email']) ?></p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 text-center">
+                                    <?php if ($user['status'] == 'aktif'): ?>
+                                        <span
+                                            class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-green-50 text-green-600 text-[10px] font-bold border border-green-100 dark:bg-green-900/20 dark:border-green-800">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> Aktif
+                                        </span>
+                                    <?php else: ?>
+                                        <span
+                                            class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 text-slate-500 text-[10px] font-bold border border-slate-200 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-400">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span> Nonaktif
+                                        </span>
+                                    <?php endif; ?>
+                                </td>
+                                <td class="px-6 py-4 font-medium text-slate-700 dark:text-slate-300">
                                     @<?= htmlspecialchars($user['username']) ?>
-                                </span>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4">
-                            <div class="flex justify-end items-center gap-2">
-                                <a href="user_detail.php?id=<?= $user['id'] ?>" 
-                                   class="text-gray-600 hover:text-purple-600 transition-colors p-2 hover:bg-purple-50 rounded-lg"
-                                   title="Lihat Detail">
-                                    <i class="fas fa-eye"></i>
-                                </a>
-                                <button type="button" 
-                                        class="text-gray-600 hover:text-teal-600 transition-colors p-2 hover:bg-teal-50 rounded-lg edit-btn"
-                                        data-id="<?= $user['id'] ?>" 
-                                        data-nama="<?= $user['nama_lengkap'] ?>" 
-                                        data-email="<?= $user['email'] ?>" 
-                                        data-username="<?= $user['username'] ?>" 
-                                        data-status="<?= $user['status'] ?>"
-                                        title="Edit">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button type="button" 
-                                        class="text-gray-600 hover:text-pink-600 transition-colors p-2 hover:bg-pink-50 rounded-lg hapus-btn"
-                                        data-id="<?= $user['id'] ?>" 
-                                        data-nama="<?= $user['nama_lengkap'] ?>"
-                                        title="Hapus">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
+                                </td>
+                                <td class="px-6 py-4 text-xs text-slate-500 dark:text-slate-400">
+                                    <?= date('d M Y', strtotime($user['created_at'])) ?>
+                                </td>
+                                <td class="px-6 py-4 text-right">
+                                    <div class="flex items-center justify-end gap-2">
+                                        <!-- Tombol Lihat Detail (Ikon Mata) -->
+                                        <a href="user_detail.php?id=<?= $user['id'] ?>"
+                                            class="w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-slate-200 text-slate-500 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-all shadow-sm dark:bg-dark-surface2 dark:border-slate-700 dark:text-slate-400 dark:hover:text-blue-400"
+                                            title="Lihat Detail">
+                                            <i class="fas fa-eye text-xs"></i>
+                                        </a>
+
+                                        <!-- Tombol Edit -->
+                                        <button type="button"
+                                            class="w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-slate-200 text-slate-500 hover:bg-primary-50 hover:text-primary-600 hover:border-primary-200 transition-all shadow-sm edit-btn dark:bg-dark-surface2 dark:border-slate-700 dark:text-slate-400 dark:hover:text-primary-400"
+                                            data-id="<?= $user['id'] ?>" data-nama="<?= $user['nama_lengkap'] ?>"
+                                            data-email="<?= $user['email'] ?>" data-username="<?= $user['username'] ?>"
+                                            data-status="<?= $user['status'] ?>" title="Edit">
+                                            <i class="fas fa-pen text-xs"></i>
+                                        </button>
+
+                                        <!-- Tombol Hapus -->
+                                        <button type="button"
+                                            class="w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-slate-200 text-slate-500 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 transition-all shadow-sm hapus-btn dark:bg-dark-surface2 dark:border-slate-700 dark:text-slate-400 dark:hover:text-rose-400"
+                                            data-id="<?= $user['id'] ?>" data-nama="<?= $user['nama_lengkap'] ?>" title="Hapus">
+                                            <i class="fas fa-trash text-xs"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                 </tbody>
             </table>
         </div>
-        
-        <!-- Pagination -->
-        <div class="px-6 py-4 bg-gray-50 flex flex-col md:flex-row justify-between items-center gap-4 border-t border-gray-200">
-            <p class="text-sm text-gray-600">
-                Menampilkan <span class="font-semibold"><?= $start_number ?></span> - <span class="font-semibold"><?= $end_number ?></span> dari <span class="font-semibold"><?= $total_data ?></span> pengguna
+
+        <!-- Pagination Footer -->
+        <div
+            class="p-4 border-t border-slate-100 bg-slate-50 dark:bg-dark-surface2 dark:border-slate-700 flex flex-col md:flex-row justify-between items-center gap-4">
+            <p class="text-xs text-slate-500 font-medium dark:text-slate-400">
+                Menampilkan <span class="font-bold text-slate-700 dark:text-white"><?= $start_number ?></span> - <span
+                    class="font-bold text-slate-700 dark:text-white"><?= $end_number ?></span> dari <span
+                    class="font-bold text-slate-700 dark:text-white"><?= $total_data ?></span> data
             </p>
+
             <?php if ($total_halaman > 1): ?>
                 <div class="flex gap-2">
                     <?php for ($i = 1; $i <= $total_halaman; $i++): ?>
-                        <a href="?page=<?= $i ?>&search=<?= urlencode($search_query) ?>&status=<?= $status_filter ?>" 
-                           class="w-9 h-9 flex items-center justify-center rounded-lg text-sm font-medium transition-all <?= $i == $halaman_aktif ? 'pagination-active shadow-sm' : 'bg-white text-gray-600 border border-gray-200 hover:border-purple-300 hover:text-purple-600' ?>">
-                           <?= $i ?>
+                        <a href="?page=<?= $i ?>&search=<?= urlencode($search_query) ?>&status=<?= $status_filter ?>"
+                            class="w-8 h-8 flex items-center justify-center rounded-lg text-xs font-bold transition-all <?= $i == $halaman_aktif ? 'bg-primary-600 text-white shadow-md shadow-primary-500/30' : 'bg-white text-slate-500 border border-slate-200 hover:border-primary-300 hover:text-primary-600 dark:bg-dark-surface dark:border-slate-600 dark:text-slate-400' ?>">
+                            <?= $i ?>
                         </a>
                     <?php endfor; ?>
                 </div>
@@ -280,217 +230,293 @@ $end_number = min($offset + $limit_per_halaman, $total_data);
 </div>
 
 <!-- Modal Form -->
-<div id="dataModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm overflow-y-auto h-full w-full hidden z-50">
-    <div class="relative top-20 mx-auto p-4 w-full max-w-md">
-        <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-200 transform transition-all">
-            <div class="px-6 py-5 bg-gradient-to-r from-purple-600 to-purple-500">
-                <div class="flex justify-between items-center">
-                    <h3 id="modalTitle" class="text-lg font-bold text-white">Tambah Pengguna Baru</h3>
-                    <button id="closeModalBtn" class="w-8 h-8 flex items-center justify-center rounded-full bg-white/20 text-white hover:bg-white/30 transition-colors">&times;</button>
-                </div>
+<div id="dataModal"
+    class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300">
+    <div class="bg-white rounded-3xl w-full max-w-md shadow-2xl transform scale-95 transition-transform duration-300 overflow-hidden dark:bg-dark-surface border border-slate-100 dark:border-slate-700"
+        id="modalContent">
+
+        <!-- Modal Header -->
+        <div
+            class="px-6 py-5 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center bg-slate-50/50 dark:bg-dark-surface2/50">
+            <div>
+                <h3 id="modalTitle" class="text-lg font-black text-slate-800 dark:text-white">Tambah Pengguna</h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Isi detail informasi pengguna</p>
             </div>
-            
-            <form id="dataForm" class="p-6 space-y-5">
-                <input type="hidden" name="action" id="formAction" value="tambah">
-                <input type="hidden" name="id" id="dataId">
-                
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Nama Lengkap *</label>
-                    <input type="text" name="nama_lengkap" id="nama_lengkap" required 
-                           class="input-focus w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none text-sm">
+            <button id="closeModalBtn"
+                class="w-8 h-8 rounded-full bg-white border border-slate-200 text-slate-400 flex items-center justify-center hover:bg-rose-50 hover:text-rose-500 hover:border-rose-200 transition-all dark:bg-dark-surface2 dark:border-slate-600 dark:text-slate-400 dark:hover:text-rose-400">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <form id="dataForm" class="p-6 space-y-5">
+            <input type="hidden" name="action" id="formAction" value="tambah">
+            <input type="hidden" name="id" id="dataId">
+
+            <div class="space-y-2">
+                <label class="text-xs font-bold text-slate-500 uppercase tracking-wider dark:text-slate-400">Nama
+                    Lengkap <span class="text-rose-500">*</span></label>
+                <input type="text" name="nama_lengkap" id="nama_lengkap" required
+                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-all dark:bg-dark-surface2 dark:border-slate-700 dark:text-white dark:focus:ring-primary-900"
+                    placeholder="Contoh: Ahmad Fulani">
+            </div>
+
+            <div class="space-y-2">
+                <label class="text-xs font-bold text-slate-500 uppercase tracking-wider dark:text-slate-400">Email <span
+                        class="text-rose-500">*</span></label>
+                <input type="email" name="email" id="email" required
+                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-all dark:bg-dark-surface2 dark:border-slate-700 dark:text-white dark:focus:ring-primary-900"
+                    placeholder="email@example.com">
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div class="space-y-2">
+                    <label
+                        class="text-xs font-bold text-slate-500 uppercase tracking-wider dark:text-slate-400">Username
+                        <span class="text-rose-500">*</span></label>
+                    <input type="text" name="username" id="username" required
+                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-all dark:bg-dark-surface2 dark:border-slate-700 dark:text-white dark:focus:ring-primary-900"
+                        placeholder="username">
                 </div>
-                
-                <div class="grid grid-cols-1 gap-5">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Email *</label>
-                        <input type="email" name="email" id="email" required 
-                               class="input-focus w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none text-sm">
-                    </div>
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Username *</label>
-                    <input type="text" name="username" id="username" required 
-                           class="input-focus w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none text-sm">
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Password <span id="passwordHint" class="text-xs text-gray-400">* wajib untuk pengguna baru</span></label>
-                    <input type="password" name="password" id="password" 
-                           class="input-focus w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none text-sm" 
-                           placeholder="Masukkan password">
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Status Pengguna</label>
-                    <select name="status" id="status_user" 
-                            class="input-focus w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none text-sm">
+                <div class="space-y-2">
+                    <label
+                        class="text-xs font-bold text-slate-500 uppercase tracking-wider dark:text-slate-400">Status</label>
+                    <select name="status" id="status_user"
+                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-all dark:bg-dark-surface2 dark:border-slate-700 dark:text-white dark:focus:ring-primary-900">
                         <option value="aktif">Aktif</option>
-                        <option value="tidak_aktif">Tidak Aktif</option>
+                        <option value="tidak_aktif">Nonaktif</option>
                     </select>
                 </div>
-                
-                <div class="flex items-center gap-3 pt-4">
-                    <button type="button" id="cancelModalBtn" 
-                            class="btn-secondary flex-1 px-4 py-3 rounded-xl text-sm font-semibold">
-                        Batal
-                    </button>
-                    <button type="submit" 
-                            class="btn-primary flex-[1.5] px-4 py-3 rounded-xl text-sm font-semibold">
-                        <i class="fas fa-save mr-2"></i> Simpan Data
+            </div>
+
+            <div class="space-y-2">
+                <label
+                    class="text-xs font-bold text-slate-500 uppercase tracking-wider dark:text-slate-400">Password</label>
+                <div class="relative">
+                    <input type="password" name="password" id="password"
+                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-all dark:bg-dark-surface2 dark:border-slate-700 dark:text-white dark:focus:ring-primary-900"
+                        placeholder="••••••••">
+                    <button type="button" onclick="togglePassword()"
+                        class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-primary-500 transition-colors">
+                        <i class="far fa-eye" id="toggleIcon"></i>
                     </button>
                 </div>
-            </form>
-        </div>
+                <p id="passwordHint" class="text-[10px] text-slate-400 italic mt-1 dark:text-slate-500">* Wajib diisi
+                    untuk pengguna baru</p>
+            </div>
+
+            <div class="pt-4 flex gap-3">
+                <button type="button" id="cancelModalBtn"
+                    class="flex-1 px-4 py-3 bg-white border border-slate-200 text-slate-600 text-sm font-bold rounded-xl hover:bg-slate-50 transition-all dark:bg-dark-surface2 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700">
+                    Batal
+                </button>
+                <button type="submit"
+                    class="flex-[2] px-4 py-3 bg-primary-600 text-white text-sm font-bold rounded-xl hover:bg-primary-700 shadow-lg shadow-primary-500/30 transition-all transform hover:-translate-y-0.5">
+                    <i class="fas fa-save mr-2"></i> Simpan Data
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const modal = document.getElementById('dataModal');
-    const openModalBtn = document.getElementById('openModalBtn');
-    const closeModalBtn = document.getElementById('closeModalBtn');
-    const cancelModalBtn = document.getElementById('cancelModalBtn');
-    const form = document.getElementById('dataForm');
-    const passwordHint = document.getElementById('passwordHint');
+    // Toggle Password Visibility
+    function togglePassword() {
+        const input = document.getElementById('password');
+        const icon = document.getElementById('toggleIcon');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.className = 'far fa-eye-slash';
+        } else {
+            input.type = 'password';
+            icon.className = 'far fa-eye';
+        }
+    }
 
-    const showModal = () => {
-        modal.classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
-    };
+    document.addEventListener('DOMContentLoaded', function () {
+        const modal = document.getElementById('dataModal');
+        const modalContent = document.getElementById('modalContent');
+        const openModalBtn = document.getElementById('openModalBtn');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const cancelModalBtn = document.getElementById('cancelModalBtn');
+        const form = document.getElementById('dataForm');
+        const passwordHint = document.getElementById('passwordHint');
 
-    const hideModal = () => {
-        modal.classList.add('hidden');
-        document.body.style.overflow = 'auto';
-    };
+        const showModal = () => {
+            modal.classList.remove('hidden');
+            // Small delay to allow display:block to apply before opacity transition
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modalContent.classList.remove('scale-95');
+                modalContent.classList.add('scale-100');
+            }, 10);
+            document.body.style.overflow = 'hidden';
+        };
 
-    openModalBtn.addEventListener('click', () => {
-        form.reset();
-        document.getElementById('modalTitle').innerHTML = 'Tambah Pengguna Baru';
-        document.getElementById('formAction').value = 'tambah';
-        document.getElementById('dataId').value = '';
-        passwordHint.textContent = '* wajib untuk pengguna baru';
-        document.getElementById('password').required = true;
-        showModal();
-    });
+        const hideModal = () => {
+            modal.classList.add('opacity-0');
+            modalContent.classList.remove('scale-100');
+            modalContent.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }, 300);
+        };
 
-    document.querySelectorAll('.edit-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const d = this.dataset;
-            document.getElementById('modalTitle').innerHTML = 'Edit Data Pengguna';
-            document.getElementById('formAction').value = 'edit';
-            document.getElementById('dataId').value = d.id;
-            document.getElementById('nama_lengkap').value = d.nama;
-            document.getElementById('email').value = d.email;
-            document.getElementById('username').value = d.username;
-            document.getElementById('status_user').value = d.status;
-            passwordHint.textContent = '* kosongkan jika tidak ingin mengubah password';
-            document.getElementById('password').required = false;
+        openModalBtn.addEventListener('click', () => {
+            form.reset();
+            document.getElementById('modalTitle').textContent = 'Tambah Pengguna';
+            document.getElementById('formAction').value = 'tambah';
+            document.getElementById('dataId').value = '';
+            passwordHint.textContent = '* Wajib diisi untuk pengguna baru';
+            passwordHint.className = 'text-[10px] text-rose-500 italic mt-1 font-bold';
+            document.getElementById('password').required = true;
             showModal();
         });
-    });
 
-    closeModalBtn.addEventListener('click', hideModal);
-    cancelModalBtn.addEventListener('click', hideModal);
-    modal.addEventListener('click', (e) => { if (e.target === modal) hideModal(); });
+        document.querySelectorAll('.edit-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const d = this.dataset;
+                document.getElementById('modalTitle').textContent = 'Edit Pengguna';
+                document.getElementById('formAction').value = 'edit';
+                document.getElementById('dataId').value = d.id;
+                document.getElementById('nama_lengkap').value = d.nama;
+                document.getElementById('email').value = d.email;
+                document.getElementById('username').value = d.username;
+                document.getElementById('status_user').value = d.status;
 
-    document.querySelectorAll('.hapus-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const id = this.dataset.id;
-            const nama = this.dataset.nama;
-
-            Swal.fire({
-                title: 'Hapus Pengguna?',
-                html: `<div class="text-center">
-                         <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-red-100 flex items-center justify-center">
-                           <i class="fas fa-trash text-red-500 text-xl"></i>
-                         </div>
-                         <p class="text-gray-700">Anda akan menghapus pengguna:</p>
-                         <p class="font-bold text-lg text-gray-800 mt-1">${nama}</p>
-                         <p class="text-sm text-gray-500 mt-2">Tindakan ini tidak dapat dibatalkan.</p>
-                       </div>`,
-                showCancelButton: true,
-                confirmButtonColor: '#ef4444',
-                cancelButtonColor: '#6b7280',
-                confirmButtonText: 'Ya, Hapus',
-                cancelButtonText: 'Batal',
-                reverseButtons: true,
-                customClass: {
-                    confirmButton: 'px-6 py-2.5 rounded-lg font-semibold',
-                    cancelButton: 'px-6 py-2.5 rounded-lg font-semibold'
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    Swal.fire({
-                        title: 'Menghapus...',
-                        text: 'Sedang memproses penghapusan data.',
-                        allowOutsideClick: false,
-                        didOpen: () => { Swal.showLoading(); }
-                    });
-                    
-                    const fd = new FormData();
-                    fd.append('action', 'hapus');
-                    fd.append('id', id);
-
-                    fetch('user_api.php', { method: 'POST', body: fd })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.status === 'success') {
-                            Swal.fire({
-                                title: 'Berhasil!',
-                                text: 'Data pengguna berhasil dihapus.',
-                                icon: 'success',
-                                confirmButtonColor: '#7c3aed',
-                                confirmButtonText: 'OK'
-                            }).then(() => location.reload());
-                        } else {
-                            Swal.fire({
-                                title: 'Gagal!',
-                                text: data.message,
-                                icon: 'error',
-                                confirmButtonColor: '#7c3aed'
-                            });
-                        }
-                    })
-                    .catch(() => Swal.fire('Error', 'Terjadi kesalahan koneksi server.', 'error'));
-                }
+                passwordHint.textContent = '* Kosongkan jika tidak ingin mengubah password';
+                passwordHint.className = 'text-[10px] text-slate-400 italic mt-1 dark:text-slate-500';
+                document.getElementById('password').required = false;
+                showModal();
             });
         });
-    });
 
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const fd = new FormData(this);
-        
-        Swal.fire({
-            title: 'Menyimpan Data...',
-            allowOutsideClick: false,
-            didOpen: () => { Swal.showLoading(); }
-        });
-        
-        fetch('user_api.php', { method: 'POST', body: fd })
-        .then(res => res.json())
-        .then(data => {
-            if (data.status === 'success') {
+        closeModalBtn.addEventListener('click', hideModal);
+        cancelModalBtn.addEventListener('click', hideModal);
+        modal.addEventListener('click', (e) => { if (e.target === modal) hideModal(); });
+
+        // Handle Delete
+        document.querySelectorAll('.hapus-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const id = this.dataset.id;
+                const nama = this.dataset.nama;
+
                 Swal.fire({
-                    title: 'Berhasil!',
-                    text: data.message,
-                    icon: 'success',
-                    confirmButtonColor: '#7c3aed',
-                    confirmButtonText: 'OK'
-                }).then(() => location.reload());
-            } else {
-                Swal.fire({
-                    title: 'Gagal!',
-                    text: data.message,
-                    icon: 'error',
-                    confirmButtonColor: '#7c3aed'
+                    title: 'Hapus Pengguna?',
+                    html: `<p class="text-slate-600 dark:text-slate-400">Anda akan menghapus data:</p>
+                       <p class="font-bold text-lg text-slate-800 dark:text-white mt-1 mb-2">${nama}</p>
+                       <p class="text-xs text-rose-500">Tindakan ini tidak dapat dibatalkan!</p>`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#F43F5E', // Rose-500
+                    cancelButtonColor: '#94A3B8', // Slate-400
+                    confirmButtonText: 'Ya, Hapus',
+                    cancelButtonText: 'Batal',
+                    background: document.documentElement.classList.contains('dark') ? '#1E293B' : '#fff',
+                    color: document.documentElement.classList.contains('dark') ? '#fff' : '#1e293b',
+                    customClass: {
+                        popup: 'rounded-3xl',
+                        confirmButton: 'rounded-xl px-6 py-2.5 font-bold',
+                        cancelButton: 'rounded-xl px-6 py-2.5 font-bold'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: 'Memproses...',
+                            text: 'Mohon tunggu sebentar',
+                            allowOutsideClick: false,
+                            didOpen: () => { Swal.showLoading(); },
+                            background: document.documentElement.classList.contains('dark') ? '#1E293B' : '#fff',
+                            color: document.documentElement.classList.contains('dark') ? '#fff' : '#1e293b',
+                            customClass: { popup: 'rounded-3xl' }
+                        });
+
+                        const fd = new FormData();
+                        fd.append('action', 'hapus');
+                        fd.append('id', id);
+
+                        fetch('user_api.php', { method: 'POST', body: fd })
+                            .then(res => res.json())
+                            .then(data => {
+                                if (data.status === 'success') {
+                                    Swal.fire({
+                                        title: 'Berhasil!',
+                                        text: 'Data pengguna berhasil dihapus.',
+                                        icon: 'success',
+                                        confirmButtonColor: '#8B5CF6',
+                                        confirmButtonText: 'OK',
+                                        background: document.documentElement.classList.contains('dark') ? '#1E293B' : '#fff',
+                                        color: document.documentElement.classList.contains('dark') ? '#fff' : '#1e293b',
+                                        customClass: { popup: 'rounded-3xl', confirmButton: 'rounded-xl font-bold' }
+                                    }).then(() => location.reload());
+                                } else {
+                                    throw new Error(data.message);
+                                }
+                            })
+                            .catch(err => {
+                                Swal.fire({
+                                    title: 'Gagal!',
+                                    text: err.message || 'Terjadi kesalahan server.',
+                                    icon: 'error',
+                                    confirmButtonColor: '#8B5CF6',
+                                    background: document.documentElement.classList.contains('dark') ? '#1E293B' : '#fff',
+                                    color: document.documentElement.classList.contains('dark') ? '#fff' : '#1e293b',
+                                    customClass: { popup: 'rounded-3xl', confirmButton: 'rounded-xl font-bold' }
+                                });
+                            });
+                    }
                 });
-            }
+            });
+        });
+
+        // Handle Submit Form
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const fd = new FormData(this);
+
+            Swal.fire({
+                title: 'Menyimpan...',
+                text: 'Mohon tunggu sebentar',
+                allowOutsideClick: false,
+                didOpen: () => { Swal.showLoading(); },
+                background: document.documentElement.classList.contains('dark') ? '#1E293B' : '#fff',
+                color: document.documentElement.classList.contains('dark') ? '#fff' : '#1e293b',
+                customClass: { popup: 'rounded-3xl' }
+            });
+
+            fetch('user_api.php', { method: 'POST', body: fd })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        hideModal();
+                        Swal.fire({
+                            title: 'Berhasil!',
+                            text: data.message,
+                            icon: 'success',
+                            confirmButtonColor: '#8B5CF6',
+                            confirmButtonText: 'OK',
+                            background: document.documentElement.classList.contains('dark') ? '#1E293B' : '#fff',
+                            color: document.documentElement.classList.contains('dark') ? '#fff' : '#1e293b',
+                            customClass: { popup: 'rounded-3xl', confirmButton: 'rounded-xl font-bold' }
+                        }).then(() => location.reload());
+                    } else {
+                        throw new Error(data.message);
+                    }
+                })
+                .catch(err => {
+                    Swal.fire({
+                        title: 'Gagal!',
+                        text: err.message || 'Terjadi kesalahan saat menyimpan data.',
+                        icon: 'error',
+                        confirmButtonColor: '#8B5CF6',
+                        background: document.documentElement.classList.contains('dark') ? '#1E293B' : '#fff',
+                        color: document.documentElement.classList.contains('dark') ? '#fff' : '#1e293b',
+                        customClass: { popup: 'rounded-3xl', confirmButton: 'rounded-xl font-bold' }
+                    });
+                });
         });
     });
-});
 </script>
 
 <?php require_once __DIR__ . '/templates/footer.php'; ?>

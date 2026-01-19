@@ -1,122 +1,35 @@
-</main>
-</div>
+</main> <!-- Penutup Main Content -->
 
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const sidebar = document.getElementById('sidebar');
-        const sidebarToggle = document.getElementById('sidebarToggle');
-        const menuToggle = document.getElementById('menuToggle');
-        const overlay = document.getElementById('overlay');
-        const body = document.body;
+<!-- Footer Admin -->
+<footer
+    class="mt-auto px-8 py-6 border-t border-slate-200 bg-white/50 backdrop-blur-sm dark:bg-dark-surface/50 dark:border-slate-700">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
 
-        // Toggle sidebar untuk desktop
-        if (sidebarToggle) {
-            sidebarToggle.addEventListener('click', function () {
-                sidebar.classList.toggle('collapsed');
+        <!-- Copyright & Brand -->
+        <div class="text-center md:text-left">
+            <p class="text-xs font-bold text-slate-500 dark:text-slate-400">
+                &copy; <?= date('Y') ?> <span class="text-primary-600 dark:text-primary-400">Nafsiyah App</span>.
+            </p>
+            <p class="text-[10px] text-slate-400 mt-0.5">
+                Administrator Panel v2.0
+            </p>
+        </div>
 
-                // Ubah ikon toggle
-                const icon = sidebarToggle.querySelector('i');
-                if (sidebar.classList.contains('collapsed')) {
-                    icon.classList.remove('fa-chevron-left');
-                    icon.classList.add('fa-chevron-right');
-                } else {
-                    icon.classList.remove('fa-chevron-right');
-                    icon.classList.add('fa-chevron-left');
-                }
-            });
-        }
+        <!-- Links & Credit -->
+        <div class="flex items-center gap-6 text-xs font-medium text-slate-500 dark:text-slate-400">
+            <a href="#" class="hover:text-primary-600 transition-colors">Bantuan</a>
+            <a href="#" class="hover:text-primary-600 transition-colors">Privasi</a>
+            <span class="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600"></span>
+            <span class="flex items-center gap-1.5">
+                Dibuat dengan <i class="fas fa-heart text-rose-500 animate-pulse"></i>
+            </span>
+        </div>
 
-        // Toggle sidebar untuk mobile
-        if (menuToggle) {
-            menuToggle.addEventListener('click', function () {
-                sidebar.classList.add('active');
-                overlay.classList.add('active');
-                body.classList.add('overflow-hidden');
-            });
-        }
+    </div>
+</footer>
 
-        // Tutup sidebar saat overlay diklik
-        if (overlay) {
-            overlay.addEventListener('click', function () {
-                sidebar.classList.remove('active');
-                overlay.classList.remove('active');
-                body.classList.remove('overflow-hidden');
-            });
-        }
+</div> <!-- Penutup Flex Column Wrapper (Konten Kanan) -->
 
-        // Tutup sidebar saat resize window (jika mobile berubah ke desktop)
-        window.addEventListener('resize', function () {
-            if (window.innerWidth >= 768) {
-                sidebar.classList.remove('active');
-                overlay.classList.remove('active');
-                body.classList.remove('overflow-hidden');
-            }
-        });
-    });
-    // User Activity Chart
-    const userActivityCtx = document.getElementById('userActivityChart').getContext('2d');
-    const userActivityChart = new Chart(userActivityCtx, {
-        type: 'line',
-        data: {
-            labels: ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'],
-            datasets: [{
-                label: 'Active Users',
-                data: [120, 190, 300, 500, 200, 300, 450],
-                backgroundColor: 'rgba(128, 90, 213, 0.2)',
-                borderColor: 'rgba(128, 90, 213, 1)',
-                borderWidth: 2,
-                tension: 0.3,
-                pointBackgroundColor: 'rgba(128, 90, 213, 1)',
-                pointRadius: 4
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    display: false
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
-        }
-    });
-
-    // Data Distribution Chart
-    const dataDistributionCtx = document.getElementById('dataDistributionChart').getContext('2d');
-    const dataDistributionChart = new Chart(dataDistributionCtx, {
-        type: 'doughnut',
-        data: {
-            labels: ['Users', 'Admins', 'Nafsiyah Data'],
-            datasets: [{
-                data: [1248, 24, 5678],
-                backgroundColor: [
-                    'rgba(128, 90, 213, 0.8)',
-                    'rgba(59, 130, 246, 0.8)',
-                    'rgba(16, 185, 129, 0.8)'
-                ],
-                borderColor: [
-                    'rgba(128, 90, 213, 1)',
-                    'rgba(59, 130, 246, 1)',
-                    'rgba(16, 185, 129, 1)'
-                ],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'bottom'
-                }
-            }
-        }
-    });
-
-</script>
 </body>
 
 </html>

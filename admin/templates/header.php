@@ -3,6 +3,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+// Proteksi Halaman Admin
 if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
     header('Location: ../login.php');
     exit();
@@ -10,315 +11,298 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
 
 $currentPage = basename($_SERVER['PHP_SELF']);
 $userName = htmlspecialchars($_SESSION['nama_lengkap'] ?? $_SESSION['username'] ?? 'Administrator');
-$userInitial = strtoupper(substr($userName, 0, 1));
 ?>
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel - Nafsiyah</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Konfigurasi Tailwind Kustom (Sama dengan User) -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#F5F3FF',
+                            100: '#EDE9FE',
+                            200: '#DDD6FE',
+                            300: '#C4B5FD',
+                            400: '#A78BFA',
+                            500: '#8B5CF6', // Ungu Utama
+                            600: '#7C3AED',
+                            700: '#6D28D9',
+                            800: '#5B21B6',
+                            900: '#4C1D95',
+                        },
+                        secondary: {
+                            50: '#FFFBEB',
+                            100: '#FEF3C7',
+                            400: '#FBBF24',
+                            500: '#F59E0B',
+                        },
+                        rose: {
+                            50: '#FFF1F2',
+                            100: '#FFE4E6',
+                            500: '#F43F5E',
+                            600: '#E11D48',
+                        },
+                        dark: {
+                            bg: '#0F172A',
+                            surface: '#1E293B',
+                            surface2: '#334155',
+                            text: '#F8FAFC',
+                            textSec: '#94A3B8',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(139, 92, 246, 0.1)',
+                        'glow': '0 0 15px rgba(139, 92, 246, 0.3)',
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        
-        :root {
-            --primary-purple: #7c3aed;
-            --primary-light: #8b5cf6;
-            --primary-dark: #5b21b6;
-            --accent-teal: #0d9488;
-            --accent-pink: #db2777;
-            --gray-50: #f8fafc;
-            --gray-100: #f1f5f9;
-            --gray-200: #e2e8f0;
-            --gray-300: #cbd5e1;
-            --gray-700: #334155;
-            --gray-900: #0f172a;
-        }
-        
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f9fafb;
-            color: var(--gray-900);
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
-        
-        /* Sidebar */
-        .sidebar {
-            background: white;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
-        }
-        
-        .nav-item {
-            transition: all 0.2s ease;
-            border-radius: 10px;
-        }
-        
-        .nav-item:hover {
-            background-color: #f5f3ff;
-            color: var(--primary-purple);
-        }
-        
-        .nav-item.active {
-            background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-light) 100%);
-            color: white;
-            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.2);
-        }
-        
-        .nav-item.active i {
-            transform: scale(1.1);
-        }
-        
-        .logo-circle {
-            background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-light) 100%);
-            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.2);
-        }
-        
-        /* Header */
-        .main-header {
-            background: white;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-        }
-        
-        .user-avatar {
-            background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-light) 100%);
-            color: white;
-            font-weight: 600;
-        }
-        
-        .page-title {
-            position: relative;
-            padding-left: 20px;
-        }
-        
-        .page-title::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--primary-purple);
-        }
-        
-        /* Breadcrumb */
-        .breadcrumb-item:not(:last-child)::after {
-            content: '/';
-            margin: 0 8px;
-            color: var(--gray-300);
-        }
-        
-        /* Smooth transitions */
-        * {
-            transition: all 0.2s ease;
-        }
-        
-        /* Card styling */
-        .card {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-            border: 1px solid var(--gray-200);
-        }
-        
-        /* Button styling */
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-light) 100%);
-            color: white;
-            font-weight: 500;
-            padding: 10px 20px;
-            border-radius: 8px;
-            transition: all 0.2s ease;
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.2);
-        }
-        
-        /* Status indicators */
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 6px;
-        }
-        
-        .status-online {
-            background-color: #10b981;
-            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
-        }
-        
-        /* Input styling */
-        .input-field {
-            border: 1px solid var(--gray-200);
-            border-radius: 8px;
-            padding: 10px 14px;
-            font-size: 14px;
-            transition: all 0.2s ease;
-        }
-        
-        .input-field:focus {
-            outline: none;
-            border-color: var(--primary-purple);
-            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
-        }
-        
-        /* Table styling */
-        .table-header {
-            background-color: var(--gray-50);
-            font-weight: 600;
-            color: var(--gray-700);
-        }
-        
-        .table-row:hover {
-            background-color: var(--gray-50);
-        }
+
+        /* Scrollbar Halus */
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #A78BFA; }
+        .dark ::-webkit-scrollbar-thumb { background: #334155; }
+
+        /* Styling Sidebar Collapsed */
+        .sidebar-collapsed .sidebar-text { display: none; opacity: 0; }
+        .sidebar-collapsed .logo-text { display: none; opacity: 0; }
+        .sidebar-collapsed .sidebar-header { justify-content: center; padding-left: 0; padding-right: 0; }
+        .sidebar-collapsed .menu-link { justify-content: center; padding-left: 0; padding-right: 0; }
+        .sidebar-collapsed .menu-icon { margin-right: 0; font-size: 1.25rem; }
+        .sidebar-collapsed .menu-arrow { display: none; }
+        .sidebar-collapsed .logout-link { justify-content: center; }
+        .sidebar-collapsed .logout-text { display: none; }
+        .sidebar-collapsed .logout-icon { margin: 0; }
+        .sidebar-collapsed .logo-container { justify-content: center; }
     </style>
 </head>
 
-<body class="flex min-h-screen">
-    <!-- Sidebar -->
-    <aside class="w-64 bg-white border-r border-gray-100 fixed h-full lg:block hidden z-40">
-        <div class="h-full flex flex-col p-6">
-            <!-- Logo -->
-            <div class="flex items-center gap-3 mb-10 px-2">
-                <div class="logo-circle w-10 h-10 rounded-xl flex items-center justify-center">
-                    <i class="fas fa-heart text-white"></i>
+<body class="flex min-h-screen relative overflow-x-hidden bg-[#F8FAFC] text-slate-900 transition-colors duration-300 dark:bg-dark-bg dark:text-dark-text font-sans">
+
+    <!-- Overlay Mobile -->
+    <div id="sidebarOverlay" class="fixed inset-0 bg-slate-900/60 z-40 hidden lg:hidden transition-opacity duration-300 backdrop-blur-sm"></div>
+
+    <!-- Sidebar Modern -->
+    <aside id="sidebar" class="fixed inset-y-0 left-0 bg-white border-r border-slate-100 z-50 transform -translate-x-full lg:translate-x-0 lg:sticky lg:top-0 lg:h-screen w-72 transition-all duration-300 ease-in-out dark:bg-dark-surface dark:border-dark-surface2 overflow-hidden flex flex-col shadow-soft">
+        
+        <!-- Tombol Close (Mobile) -->
+        <button id="closeSidebarBtn" class="lg:hidden absolute top-4 right-4 p-2 text-slate-400 hover:text-rose-500 transition-colors rounded-lg hover:bg-slate-50 dark:hover:bg-dark-surface2">
+            <i class="fas fa-times text-xl"></i>
+        </button>
+
+        <!-- 1. Header Sidebar (Logo) -->
+        <div class="h-20 flex items-center px-6 sidebar-header transition-all duration-300 flex-shrink-0 border-b border-dashed border-slate-100 dark:border-slate-700">
+            <div class="flex items-center gap-3 w-full justify-start transition-all duration-300 logo-container">
+                <div class="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center text-white shadow-glow flex-shrink-0">
+                    <i class="fas fa-user-shield text-xl"></i>
                 </div>
-                <div>
-                    <span class="text-lg font-bold text-gray-900">Nafsiyah</span>
-                    <p class="text-xs text-gray-500 font-medium mt-0.5">Admin Panel</p>
+                <div class="logo-text overflow-hidden whitespace-nowrap transition-all duration-300">
+                    <h1 class="text-xl font-extrabold text-slate-800 tracking-tight leading-none dark:text-white font-sans">Admin Panel</h1>
+                    <p class="text-[10px] font-semibold text-primary-500 tracking-widest uppercase mt-0.5 font-sans">Nafsiyah App</p>
                 </div>
             </div>
+        </div>
 
-            <!-- Navigation -->
-            <nav class="flex-1 space-y-2">
+        <!-- Scrollable Content -->
+        <div class="flex-1 flex flex-col px-4 pb-4 overflow-y-auto scrollbar-hide pt-6">
+            
+            <!-- 2. Navigation Menu -->
+            <nav class="space-y-1 flex-1 font-sans">
                 <?php
                 $menus = [
-                    ['index.php', 'Dashboard', 'fas fa-chart-line'],
+                    ['index.php', 'Dashboard', 'fas fa-chart-pie'],
                     ['user.php', 'Kelola User', 'fas fa-users'],
-                    ['admin.php', 'Kelola Admin', 'fas fa-user-shield'],
-                    ['nafsiyah.php', 'Master Nafsiyah', 'fas fa-heart']
+                    ['admin.php', 'Kelola Admin', 'fas fa-user-tie'],
+                    ['nafsiyah.php', 'Master Nafsiyah', 'fas fa-list-check']
                 ];
 
                 foreach ($menus as $m):
-                    $active = ($currentPage == $m[0]) ? 'active' : '';
-                ?>
-                <a href="<?= $m[0] ?>" 
-                   class="flex items-center px-4 py-3 rounded-lg font-medium text-sm nav-item <?= $active ?>">
-                    <div class="w-5 mr-3 text-center">
-                        <i class="<?= $m[2] ?>"></i>
-                    </div>
-                    <span><?= $m[1] ?></span>
-                    <?php if ($active): ?>
-                    <div class="ml-auto w-2 h-2 rounded-full bg-white"></div>
-                    <?php endif; ?>
-                </a>
+                    $is_active = ($currentPage == $m[0]);
+                    $activeClass = 'bg-primary-600 text-white shadow-soft';
+                    $inactiveClass = 'text-slate-500 hover:bg-primary-50 hover:text-primary-700 dark:text-slate-400 dark:hover:bg-dark-surface2 dark:hover:text-white';
+                    ?>
+                    <a href="<?= $m[0] ?>" class="menu-link flex items-center px-4 py-3 rounded-xl font-semibold text-sm transition-all duration-200 group relative overflow-hidden whitespace-nowrap <?= $is_active ? $activeClass : $inactiveClass ?>" title="<?= $m[1] ?>">
+                        <i class="<?= $m[2] ?> menu-icon w-6 text-center text-lg mr-3 transition-transform group-hover:scale-110 <?= $is_active ? 'text-white' : 'text-slate-400 group-hover:text-primary-600 dark:text-slate-500 dark:group-hover:text-white' ?>"></i>
+                        <span class="sidebar-text transition-opacity duration-300 font-sans"><?= $m[1] ?></span>
+                        <?php if ($is_active): ?>
+                                <i class="fas fa-chevron-right menu-arrow ml-auto text-xs opacity-70"></i>
+                        <?php endif; ?>
+                    </a>
                 <?php endforeach; ?>
             </nav>
 
-            <!-- User Profile & Logout -->
-            <div class="mt-auto pt-6 border-t border-gray-100">
-                <!-- User Info -->
-                <div class="flex items-center gap-3 px-2 py-3 mb-4 rounded-lg bg-gray-50">
-                    <div class="user-avatar w-8 h-8 rounded-lg flex items-center justify-center">
-                        <?= $userInitial ?>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <p class="text-sm font-medium text-gray-900 truncate"><?= $userName ?></p>
-                        <div class="flex items-center gap-2 mt-0.5">
-                            <span class="status-dot status-online"></span>
-                            <span class="text-xs text-gray-500">Online</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Logout -->
-                <a href="../logout.php" 
-                   class="flex items-center px-4 py-3 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all">
-                    <div class="w-5 mr-3 text-center">
-                        <i class="fas fa-sign-out-alt"></i>
-                    </div>
-                    <span class="font-medium">Keluar</span>
+            <!-- 3. Logout Button -->
+            <div class="mt-auto">
+                <a href="../logout.php" class="logout-link flex items-center px-4 py-3 rounded-xl font-semibold text-sm text-rose-500 bg-rose-50 hover:bg-rose-100 hover:shadow-sm transition-all dark:bg-rose-900/10 dark:hover:bg-rose-900/20 whitespace-nowrap" title="Keluar">
+                    <i class="fas fa-sign-out-alt logout-icon w-6 text-center text-lg mr-3"></i>
+                    <span class="sidebar-text logout-text">Keluar</span>
                 </a>
             </div>
+
         </div>
     </aside>
 
-    <!-- Main Content -->
-    <div class="flex-1 lg:ml-64 flex flex-col">
-        <!-- Header -->
-        <header class="h-16 bg-white border-b border-gray-100 sticky top-0 z-30 px-6 flex justify-between items-center">
-            <!-- Left: Page Title -->
+    <!-- Main Content Area -->
+    <div class="flex-1 flex flex-col min-w-0 transition-all duration-300">
+        
+        <!-- Header Topbar -->
+        <header class="h-16 sticky top-0 z-30 px-4 md:px-8 flex justify-between items-center bg-white shadow-sm dark:bg-dark-surface dark:border-b dark:border-slate-700">
             <div class="flex items-center gap-4">
                 <!-- Mobile Menu Button -->
-                <button class="lg:hidden w-9 h-9 rounded-lg bg-gray-100 text-gray-600 flex items-center justify-center hover:bg-gray-200">
-                    <i class="fas fa-bars"></i>
+                <button id="mobileMenuBtn" class="lg:hidden text-slate-500 hover:text-primary-600 p-2 rounded-lg transition-colors bg-slate-50 shadow-sm border border-slate-100 dark:bg-dark-surface2 dark:border-slate-700 dark:text-white">
+                    <i class="fas fa-bars text-lg"></i>
                 </button>
-                
+
+                <!-- Desktop Sidebar Toggle -->
+                <button id="desktopSidebarToggle" class="hidden lg:flex text-slate-400 hover:text-primary-600 p-2 rounded-lg transition-colors hover:bg-slate-50" title="Toggle Sidebar">
+                    <i class="fas fa-indent text-xl transition-transform duration-300" id="toggleIcon"></i>
+                </button>
+
                 <!-- Page Title -->
-                <div class="page-title">
-                    <?php
-                    $pageTitles = [
-                        'index.php' => 'Dashboard',
-                        'user.php' => 'Kelola User',
-                        'admin.php' => 'Kelola Admin',
-                        'nafsiyah.php' => 'Master Nafsiyah'
-                    ];
-                    ?>
-                    <h1 class="text-lg font-semibold text-gray-900">
-                        <?= $pageTitles[$currentPage] ?? 'Admin Panel' ?>
-                    </h1>
-                    <div class="flex items-center gap-2 text-xs text-gray-500 mt-1">
-                        <span>Admin</span>
-                        <span>•</span>
-                        <span><?= date('d M Y') ?></span>
-                    </div>
+                <div class="flex flex-col">
+                    <h2 class="font-bold text-slate-800 dark:text-white text-lg font-sans leading-none">
+                        <?php
+                        $titles = [
+                            'index.php' => 'Dashboard',
+                            'user.php' => 'Manajemen User',
+                            'admin.php' => 'Manajemen Admin',
+                            'nafsiyah.php' => 'Master Data'
+                        ];
+                        echo $titles[$currentPage] ?? 'Admin Area';
+                        ?>
+                    </h2>
+                    <span class="text-[10px] text-slate-400 hidden sm:block">Administrator Panel</span>
                 </div>
             </div>
             
-            <!-- Right: User Info -->
-            <div class="flex items-center gap-3">
-                <!-- Notifications (Optional) -->
-                <button class="w-9 h-9 rounded-lg bg-gray-100 text-gray-600 flex items-center justify-center hover:bg-gray-200 relative">
-                    <i class="fas fa-bell"></i>
-                    <span class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">3</span>
+            <div class="flex items-center gap-4">
+                <!-- Theme Toggle -->
+                <button id="headerThemeToggle" class="w-9 h-9 rounded-full bg-slate-50 border border-slate-200 text-slate-500 flex items-center justify-center shadow-sm hover:text-primary-600 hover:shadow-md transition-all dark:bg-dark-surface2 dark:border-slate-700 dark:text-white">
+                    <i class="fas fa-moon"></i>
                 </button>
-                
-                <!-- User Profile -->
-                <div class="flex items-center gap-3">
-                    <div class="hidden md:block text-right">
-                        <p class="text-sm font-medium text-gray-900"><?= $userName ?></p>
-                        <p class="text-xs text-gray-500">Administrator</p>
+
+                <div class="h-8 w-[1px] bg-slate-200 dark:bg-slate-700 hidden sm:block"></div>
+
+                <!-- Profile Info -->
+                <div class="flex items-center gap-3 hidden sm:flex">
+                    <div class="text-right">
+                        <p class="text-[10px] font-bold text-slate-400 uppercase leading-none mb-0.5 font-sans">Halo Admin,</p>
+                        <p class="text-sm font-bold text-slate-800 dark:text-white font-sans"><?= htmlspecialchars($userName) ?></p>
                     </div>
-                    <div class="relative">
-                        <div class="user-avatar w-10 h-10 rounded-lg flex items-center justify-center cursor-pointer">
-                            <?= $userInitial ?>
-                        </div>
+                    <div class="w-9 h-9 rounded-full bg-primary-100 p-0.5 border border-primary-200 dark:bg-primary-900/30 dark:border-primary-800">
+                        <img src="https://ui-avatars.com/api/?name=<?= urlencode($userName) ?>&background=8B5CF6&color=fff&bold=true" class="w-full h-full rounded-full object-cover" alt="Admin">
                     </div>
                 </div>
             </div>
         </header>
 
-        <!-- Breadcrumb (Optional) -->
-        <div class="px-6 py-3 bg-gray-50 border-b border-gray-100">
-            <nav class="flex items-center text-sm">
-                <a href="index.php" class="text-gray-600 hover:text-purple-600">Dashboard</a>
-                <?php if ($currentPage != 'index.php'): ?>
-                <span class="breadcrumb-item">
-                    <a href="<?= $currentPage ?>" class="text-gray-900 font-medium"><?= $pageTitles[$currentPage] ?? 'Page' ?></a>
-                </span>
-                <?php endif; ?>
-            </nav>
-        </div>
+        <!-- JavaScript Logic -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const sidebar = document.getElementById('sidebar');
+                const overlay = document.getElementById('sidebarOverlay');
+                const toggleIcon = document.getElementById('toggleIcon');
+                
+                const mobileBtn = document.getElementById('mobileMenuBtn');
+                const closeBtn = document.getElementById('closeSidebarBtn');
+                const desktopBtn = document.getElementById('desktopSidebarToggle');
 
-        <!-- Main Content Area -->
-        <main class="flex-1 p-6 bg-gray-50">
-            <!-- Content will be inserted here -->
+                // 1. Mobile Toggle
+                function toggleMobileMenu() {
+                    sidebar.classList.toggle('-translate-x-full');
+                    overlay.classList.toggle('hidden');
+                    document.body.classList.toggle('overflow-hidden');
+                }
+
+                if (mobileBtn) mobileBtn.addEventListener('click', toggleMobileMenu);
+                if (closeBtn) closeBtn.addEventListener('click', toggleMobileMenu);
+                if (overlay) overlay.addEventListener('click', toggleMobileMenu);
+
+                // 2. Desktop Toggle (Collapse)
+                let isCollapsed = localStorage.getItem('admin-sidebar-collapsed') === 'true';
+
+                function updateSidebarState() {
+                    if (window.innerWidth >= 1024) { 
+                        if (isCollapsed) {
+                            sidebar.classList.add('w-20', 'sidebar-collapsed');
+                            sidebar.classList.remove('w-72');
+                            if(toggleIcon) toggleIcon.classList.replace('fa-indent', 'fa-outdent');
+                        } else {
+                            sidebar.classList.remove('w-20', 'sidebar-collapsed');
+                            sidebar.classList.add('w-72');
+                            if(toggleIcon) toggleIcon.classList.replace('fa-outdent', 'fa-indent');
+                        }
+                    }
+                }
+
+                if (desktopBtn) {
+                    desktopBtn.addEventListener('click', () => {
+                        isCollapsed = !isCollapsed;
+                        localStorage.setItem('admin-sidebar-collapsed', isCollapsed);
+                        updateSidebarState();
+                    });
+                }
+
+                updateSidebarState();
+                window.addEventListener('resize', updateSidebarState);
+
+                // 3. Theme Toggle
+                const headerThemeBtn = document.getElementById('headerThemeToggle');
+                const htmlEl = document.documentElement;
+
+                function updateThemeIcon() {
+                    const isDark = htmlEl.classList.contains('dark');
+                    const iconClass = isDark ? 'fas fa-sun' : 'fas fa-moon';
+                    if(headerThemeBtn) headerThemeBtn.querySelector('i').className = iconClass;
+                }
+
+                const themeCookie = document.cookie.split('; ').find(row => row.startsWith('theme='));
+                if (themeCookie && themeCookie.split('=')[1] === 'dark') {
+                    htmlEl.classList.add('dark');
+                }
+                updateThemeIcon();
+
+                if (headerThemeBtn) {
+                    headerThemeBtn.addEventListener('click', () => {
+                        const isDark = htmlEl.classList.contains('dark');
+                        if (isDark) {
+                            htmlEl.classList.remove('dark');
+                            document.cookie = "theme=light; path=/; max-age=31536000";
+                        } else {
+                            htmlEl.classList.add('dark');
+                            document.cookie = "theme=dark; path=/; max-age=31536000";
+                        }
+                        updateThemeIcon();
+                    });
+                }
+            });
+        </script>
+
+        <main class="p-4 md:p-8 lg:p-10 max-w-7xl mx-auto w-full font-sans">

@@ -4,7 +4,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 // Proteksi Halaman: Cek session login user
-if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'user') {
+if (!isset($_SESSION['user_id'])) {
     header('Location: ../login.php');
     exit();
 }
@@ -13,137 +13,456 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'user') {
 require_once __DIR__ . '/../../koneksi.php';
 
 // Ambil Data Sidebar (Poin & Streak)
-$stmt_sidebar = $pdo->prepare("SELECT nama_lengkap, total_poin, streak_count FROM users WHERE id = ?");
+$stmt_sidebar = $pdo->prepare("SELECT username, total_poin, streak_count FROM users WHERE id = ?");
 $stmt_sidebar->execute([$_SESSION['user_id']]);
 $user_sidebar = $stmt_sidebar->fetch();
 
-$nama_tampil = $user_sidebar['nama_lengkap'] ?? $_SESSION['nama_lengkap'] ?? 'Pejuang Nafsiyah';
+$nama_tampil = $user_sidebar['username'] ?? 'Pejuang Nafsiyah';
 $total_poin_sidebar = $user_sidebar['total_poin'] ?? 0;
 $streak_sidebar = $user_sidebar['streak_count'] ?? 0;
 ?>
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nafsiyah App - Spiritual Journey</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Konfigurasi Tailwind Kustom -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        // Palet Warna Ungu Modern
+                        primary: {
+                            50: '#F5F3FF',
+                            100: '#EDE9FE',
+                            200: '#DDD6FE',
+                            300: '#C4B5FD',
+                            400: '#A78BFA',
+                            500: '#8B5CF6', // Ungu Utama
+                            600: '#7C3AED',
+                            700: '#6D28D9',
+                            800: '#5B21B6',
+                            900: '#4C1D95',
+                        },
+                        secondary: {
+                            50: '#FFFBEB',
+                            100: '#FEF3C7',
+                            400: '#FBBF24', // Kuning/Gold
+                            500: '#F59E0B',
+                        },
+                        rose: {
+                            50: '#FFF1F2',
+                            100: '#FFE4E6',
+                            500: '#F43F5E',
+                            600: '#E11D48',
+                        },
+                        dark: {
+                            bg: '#0F172A',
+                            surface: '#1E293B',
+                            surface2: '#334155',
+                            text: '#F8FAFC',
+                            textSec: '#94A3B8',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(139, 92, 246, 0.1)',
+                        'glow': '0 0 15px rgba(139, 92, 246, 0.3)',
+                    },
+                    transitionProperty: {
+                        'width': 'width',
+                        'spacing': 'margin, padding',
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background-color: #f8fafc; 
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        /* Scrollbar Halus */
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #CBD5E1;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #A78BFA;
+        }
+
+        .dark ::-webkit-scrollbar-thumb {
+            background: #334155;
+        }
+
+        /* Styling Khusus untuk Sidebar Collapsed */
+        .sidebar-collapsed .sidebar-text {
+            display: none;
+            opacity: 0;
+        }
+
+        .sidebar-collapsed .logo-container {
+            justify-content: center;
+        }
+
+        .sidebar-collapsed .logo-text {
+            width: 0;
+            opacity: 0;
+        }
+
+        .sidebar-collapsed .logo-box {
+            width: 3.5rem;
+            /* lebih besar saat kecil */
+            height: 3.5rem;
+        }
+
+        .sidebar-collapsed .sidebar-header {
+            justify-content: center;
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        /* Stats saat collapsed */
+        .sidebar-collapsed .stats-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .sidebar-collapsed .stat-item {
+            flex-direction: column;
+            padding: 8px 4px;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .sidebar-collapsed .stat-label {
+            display: none;
+        }
+
+        .sidebar-collapsed .stat-value {
+            font-size: 0.65rem;
+        }
+
+        .sidebar-collapsed .stat-icon {
+            font-size: 1rem;
+            margin-bottom: 2px;
+        }
+
+        /* Menu saat collapsed */
+        .sidebar-collapsed .menu-link {
+            justify-content: center;
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        .sidebar-collapsed .menu-icon {
+            margin-right: 0;
+            font-size: 1.25rem;
+        }
+
+        .sidebar-collapsed .menu-arrow {
+            display: none;
+        }
+
+        /* Logout saat collapsed */
+        .sidebar-collapsed .logout-link {
+            justify-content: center;
+        }
+
+        .sidebar-collapsed .logout-text {
+            display: none;
+        }
+
+        .sidebar-collapsed .logout-icon {
+            margin: 0;
+        }
+
+        /* Close Button Sidebar Mobile */
+        .sidebar-close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            z-index: 50;
         }
     </style>
 </head>
-<body class="flex min-h-screen relative overflow-x-hidden">
 
-    <div id="sidebarOverlay" class="fixed inset-0 bg-slate-900/50 z-30 hidden lg:hidden transition-opacity duration-300"></div>
+<body
+    class="flex min-h-screen relative overflow-x-hidden bg-[#F8FAFC] text-slate-900 transition-colors duration-300 dark:bg-dark-bg dark:text-dark-text font-sans">
 
-    <aside id="sidebar" class="fixed inset-y-0 left-0 w-72 bg-white border-r border-slate-200 z-40 transform -translate-x-full lg:translate-x-0 lg:static lg:block transition-all duration-300 ease-in-out shadow-2xl lg:shadow-none">
-        <div class="h-full flex flex-col p-8">
-            <div class="flex items-center justify-between mb-10">
-                <div class="flex items-center space-x-3">
-                    <div class="h-10 w-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-100 rotate-3">
-                        <i class="fas fa-leaf text-white text-lg"></i>
-                    </div>
-                    <div>
-                        <h1 class="text-xl font-black text-slate-800 tracking-tighter uppercase italic leading-none">Nafsiyah</h1>
-                        <span class="text-[9px] font-bold text-indigo-400 uppercase tracking-[0.3em]">User Panel</span>
-                    </div>
+    <!-- Overlay Mobile -->
+    <div id="sidebarOverlay"
+        class="fixed inset-0 bg-slate-900/60 z-40 hidden lg:hidden transition-opacity duration-300 backdrop-blur-sm">
+    </div>
+
+    <!-- Sidebar Modern -->
+    <aside id="sidebar"
+        class="fixed inset-y-0 left-0 bg-white border-r border-slate-100 z-50 transform -translate-x-full lg:translate-x-0 lg:sticky lg:top-0 lg:h-screen w-72 transition-all duration-300 ease-in-out dark:bg-dark-surface dark:border-dark-surface2 overflow-hidden flex flex-col shadow-soft">
+
+        <!-- Tombol Close Sidebar (Mobile Only) - Di pojok kanan atas sidebar -->
+        <button id="closeSidebarBtn"
+            class="lg:hidden sidebar-close-btn p-2 text-slate-400 hover:text-rose-500 transition-colors rounded-lg hover:bg-slate-50 dark:hover:bg-dark-surface2">
+            <i class="fas fa-times text-xl"></i>
+        </button>
+
+        <!-- 1. Header Sidebar (Logo) -->
+        <div class="h-20 flex items-center px-6 sidebar-header transition-all duration-300 flex-shrink-0">
+            <div class="flex items-center gap-3 w-full transition-all duration-300 logo-container">
+
+                <!-- Logo Utama -->
+                <div
+                    class="logo-box w-12 h-12 rounded-xl flex items-center justify-center shadow-glow transition-all duration-300">
+                    <img src="../assets/img/logo.png" class="w-full h-full object-contain" />
                 </div>
-                <button id="closeSidebarBtn" class="lg:hidden text-slate-400 hover:text-red-500">
-                    <i class="fas fa-times text-xl"></i>
-                </button>
-            </div>
 
-            <nav class="flex-1 space-y-1">
+                <!-- Teks Logo -->
+                <div class="logo-text overflow-hidden whitespace-nowrap transition-all duration-300">
+                    <h1 class="text-xl font-extrabold text-slate-800 dark:text-white">
+                        Nafsiyah
+                    </h1>
+                    <p class="text-[10px] font-semibold text-primary-500 tracking-widest uppercase">
+                        My Journey
+                    </p>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Scrollable Content -->
+        <div class="flex-1 flex flex-col px-4 pb-4 overflow-y-auto scrollbar-hide">
+
+            <!-- 2. Navigation Menu -->
+            <nav class="space-y-1 flex-1 mt-4 font-sans">
                 <?php
-                // Menambahkan Leaderboard ke dalam array menu
                 $menu = [
-                    ['dashboard.php', 'fas fa-chart-pie', 'Overview'],
-                    ['index.php', 'fas fa-list-check', 'Amalan Harian'],
-                    ['laporan.php', 'fas fa-history', 'Riwayat Laporan'],
-                    ['leaderboard.php', 'fas fa-trophy', 'Leaderboard'], // MENU BARU!
-                    ['profil.php', 'fas fa-user-gear', 'Pengaturan'],
+                    ['dashboard.php', 'fas fa-home', 'Dashboard'],
+                    ['index.php', 'fas fa-check-square', 'Amalan Harian'],
+                    ['laporan.php', 'fas fa-chart-bar', 'Statistik'],
+                    ['leaderboard.php', 'fas fa-trophy', 'Leaderboard'],
+                    ['profil.php', 'fas fa-cog', 'Pengaturan'],
                 ];
 
                 $current_file = basename($_SERVER['PHP_SELF']);
+
                 foreach ($menu as $item):
                     $is_active = ($current_file == $item[0]);
-                ?>
-                <a href="<?= $item[0] ?>" class="flex items-center px-4 py-3.5 rounded-xl transition-all duration-200 <?= $is_active ? 'bg-indigo-50 text-indigo-600 shadow-sm' : 'text-slate-400 hover:bg-slate-50 hover:text-indigo-600' ?>">
-                    <i class="<?= $item[1] ?> mr-4 text-base w-5 text-center"></i> 
-                    <span class="font-bold text-[10px] uppercase tracking-[0.2em]"><?= $item[2] ?></span>
-                </a>
+                    $activeClass = 'bg-primary-600 text-white shadow-soft';
+                    $inactiveClass = 'text-slate-500 hover:bg-primary-50 hover:text-primary-700 dark:text-slate-400 dark:hover:bg-dark-surface2 dark:hover:text-white';
+                    ?>
+                    <a href="<?= $item[0] ?>"
+                        class="menu-link flex items-center px-4 py-3 rounded-xl font-semibold text-sm transition-all duration-200 group relative overflow-hidden whitespace-nowrap <?= $is_active ? $activeClass : $inactiveClass ?>"
+                        title="<?= $item[2] ?>">
+                        <i
+                            class="<?= $item[1] ?> menu-icon w-6 text-center text-lg mr-3 transition-transform group-hover:scale-110 <?= $is_active ? 'text-white' : 'text-slate-400 group-hover:text-primary-600 dark:text-slate-500 dark:group-hover:text-white' ?>"></i>
+                        <span class="sidebar-text transition-opacity duration-300 font-sans"><?= $item[2] ?></span>
+                        <?php if ($is_active): ?>
+                            <i class="fas fa-chevron-right menu-arrow ml-auto text-xs opacity-70"></i>
+                        <?php endif; ?>
+                    </a>
                 <?php endforeach; ?>
             </nav>
 
-            <div class="mt-auto pt-6 border-t border-slate-100">
-                <div class="grid grid-cols-2 gap-2 mb-6 text-center">
-                    <div class="p-2 bg-slate-50 rounded-xl border border-slate-100">
-                        <p class="text-[8px] font-bold text-slate-400 uppercase mb-1">Poin</p>
-                        <p class="text-xs font-black text-indigo-600"><?php echo number_format($total_poin_sidebar); ?></p>
+            <!-- 4. Stats (Poin & Streak) - Di ATAS Button Keluar -->
+            <div class="mt-6 mb-4 font-sans">
+                <div class="stats-container grid grid-cols-2 gap-2 transition-all duration-300">
+                    <!-- Poin -->
+                    <div
+                        class="stat-item bg-slate-50 border border-slate-100 rounded-xl p-2.5 text-center dark:bg-dark-surface2 dark:border-slate-700 transition-all">
+                        <i class="fas fa-star text-primary-500 text-sm mb-1 stat-icon block"></i>
+                        <div>
+                            <p
+                                class="stat-label text-[8px] font-bold text-slate-400 uppercase leading-none mb-0.5 font-sans">
+                                Poin</p>
+                            <span
+                                class="stat-value text-xs font-black text-slate-700 dark:text-white leading-none font-sans"><?php echo number_format($total_poin_sidebar); ?></span>
+                        </div>
                     </div>
-                    <div class="p-2 bg-slate-50 rounded-xl border border-slate-100">
-                        <p class="text-[8px] font-bold text-slate-400 uppercase mb-1">Streak</p>
-                        <p class="text-xs font-black text-orange-500">🔥 <?php echo $streak_sidebar; ?></p>
+                    <!-- Streak -->
+                    <div
+                        class="stat-item bg-slate-50 border border-slate-100 rounded-xl p-2.5 text-center dark:bg-dark-surface2 dark:border-slate-700 transition-all">
+                        <i class="fas fa-fire text-secondary-500 text-sm mb-1 stat-icon block"></i>
+                        <div>
+                            <p
+                                class="stat-label text-[8px] font-bold text-slate-400 uppercase leading-none mb-0.5 font-sans">
+                                Streak</p>
+                            <span
+                                class="stat-value text-xs font-black text-slate-700 dark:text-white leading-none font-sans"><?php echo $streak_sidebar; ?></span>
+                        </div>
                     </div>
                 </div>
-                <a href="../logout.php" class="flex items-center px-4 py-3 text-red-400 hover:bg-red-50 rounded-xl transition-all font-bold text-[10px] uppercase tracking-[0.2em]">
-                    <i class="fas fa-power-off mr-4 text-center w-5"></i> Keluar
+            </div>
+
+            <!-- 5. Logout Button (Paling Bawah) -->
+            <div class="font-sans">
+                <a href="../logout.php"
+                    class="logout-link flex items-center px-4 py-3 rounded-xl font-semibold text-sm text-rose-500 bg-rose-50 hover:bg-rose-100 hover:shadow-sm transition-all dark:bg-rose-900/10 dark:hover:bg-rose-900/20 whitespace-nowrap"
+                    title="Keluar">
+                    <i class="fas fa-sign-out-alt logout-icon w-6 text-center text-lg mr-3"></i>
+                    <span class="sidebar-text logout-text">Keluar</span>
                 </a>
             </div>
+
         </div>
     </aside>
 
-    <div class="flex-1 flex flex-col min-w-0">
-        <header class="h-20 bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-30 px-6 lg:px-10 flex justify-between items-center">
-            <div class="flex items-center">
-                <button id="mobileMenuBtn" class="lg:hidden mr-4 text-slate-400 hover:text-indigo-600 transition-all p-2 bg-slate-50 rounded-lg">
-                    <i class="fas fa-bars-staggered text-lg"></i>
+    <!-- Main Content Area -->
+    <div class="flex-1 flex flex-col min-w-0 transition-all duration-300">
+
+        <!-- Header Topbar (Minimalis - Hanya Toggle Sidebar & Theme) -->
+        <header
+            class="bg-white h-16 sticky top-0 z-30 px-4 md:px-8 flex justify-between items-center bg-[#F8FAFC]/80 backdrop-blur-md dark:bg-dark-bg/90 border-b border-transparent">
+            <div class="flex items-center gap-4">
+                <!-- Mobile Menu Button (Burger) -->
+                <button id="mobileMenuBtn"
+                    class="lg:hidden text-slate-500 hover:text-primary-600 p-2 rounded-lg transition-colors bg-white shadow-sm border border-slate-100 dark:bg-dark-surface dark:border-slate-700 dark:text-white">
+                    <i class="fas fa-bars text-lg"></i>
                 </button>
-                <h2 class="text-xs font-black text-slate-400 tracking-[0.4em] uppercase italic">
-                    <?php 
-                        if($current_file == 'dashboard.php') echo 'User Workspace';
-                        elseif($current_file == 'index.php') echo 'Daily Checklist';
-                        elseif($current_file == 'laporan.php') echo 'History Log';
-                        elseif($current_file == 'leaderboard.php') echo 'Leaderboard';
-                        elseif($current_file == 'profil.php') echo 'Profile Settings';
-                        else echo 'Nafsiyah App';
-                    ?>
-                </h2>
+
+                <!-- Desktop Sidebar Toggle (Shrink/Expand Button) -->
+                <button id="desktopSidebarToggle"
+                    class="hidden lg:flex text-slate-400 hover:text-primary-600 p-2 rounded-lg transition-colors hover:bg-white/50"
+                    title="Toggle Sidebar">
+                    <i class="fas fa-indent text-xl transition-transform duration-300" id="toggleIcon"></i>
+                </button>
+
+                <!-- Page Title (Mobile Only) -->
+                <span class="lg:hidden font-bold text-slate-800 dark:text-white text-lg font-sans">Nafsiyah</span>
             </div>
-            
-            <div class="flex items-center space-x-4">
-                <div class="text-right hidden sm:block">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase leading-none mb-1">Selamat Datang,</p>
-                    <p class="font-black text-slate-700 text-xs italic uppercase tracking-tighter"><?php echo htmlspecialchars($nama_tampil); ?></p>
-                </div>
-                <div class="h-10 w-10 rounded-xl bg-slate-50 border border-slate-200 p-0.5 shadow-sm">
-                    <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($nama_tampil); ?>&background=f1f5f9&color=6366f1&bold=true" class="h-full w-full rounded-lg" alt="User">
+
+            <div class="flex items-center gap-4 bg-white">
+                <button id="headerThemeToggle"
+                    class="w-9 h-9 rounded-full bg-white border border-slate-200 text-slate-500 flex items-center justify-center shadow-sm hover:text-primary-600 hover:shadow-md transition-all dark:bg-dark-surface dark:border-slate-700 dark:text-white">
+                    <i class="fas fa-moon"></i>
+                </button>
+
+                <!-- Profile Info (Restored to Header) -->
+                <div class="h-8 w-[1px] bg-slate-200 dark:bg-slate-700 hidden sm:block"></div>
+
+                <div class="flex items-center gap-3 hidden sm:flex">
+                    <div class="text-right">
+                        <p class="text-[10px] font-bold text-slate-400 uppercase leading-none mb-0.5 font-sans">
+                            Assalamu'alaikum,</p>
+                        <p class="text-sm font-bold text-slate-800 dark:text-white font-sans">
+                            <?php echo htmlspecialchars($nama_tampil); ?>
+                        </p>
+                    </div>
+                    <div
+                        class="w-9 h-9 rounded-full bg-primary-100 p-0.5 border border-primary-200 dark:bg-primary-900/30 dark:border-primary-800">
+                        <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($nama_tampil); ?>&background=8B5CF6&color=fff&bold=true"
+                            class="w-full h-full rounded-full object-cover" alt="User">
+                    </div>
                 </div>
             </div>
         </header>
 
+        <!-- Script Logic -->
         <script>
             document.addEventListener('DOMContentLoaded', function () {
                 const sidebar = document.getElementById('sidebar');
-                const menuBtn = document.getElementById('mobileMenuBtn');
-                const closeBtn = document.getElementById('closeSidebarBtn');
                 const overlay = document.getElementById('sidebarOverlay');
+                const toggleIcon = document.getElementById('toggleIcon');
 
-                function toggleMenu() {
+                const mobileBtn = document.getElementById('mobileMenuBtn');
+                const closeBtn = document.getElementById('closeSidebarBtn');
+                const desktopBtn = document.getElementById('desktopSidebarToggle');
+
+                // 1. Mobile Toggle
+                function toggleMobileMenu() {
                     sidebar.classList.toggle('-translate-x-full');
                     overlay.classList.toggle('hidden');
                     document.body.classList.toggle('overflow-hidden');
                 }
 
-                menuBtn.addEventListener('click', toggleMenu);
-                closeBtn.addEventListener('click', toggleMenu);
-                overlay.addEventListener('click', toggleMenu);
+                if (mobileBtn) mobileBtn.addEventListener('click', toggleMobileMenu);
+                if (closeBtn) closeBtn.addEventListener('click', toggleMobileMenu);
+                if (overlay) overlay.addEventListener('click', toggleMobileMenu);
+
+                // 2. Desktop Toggle (Collapse)
+                // Cek localStorage, default false (expanded)
+                let isCollapsed = localStorage.getItem('sidebar-collapsed') === 'true';
+
+                function updateSidebarState() {
+                    if (window.innerWidth >= 1024) {
+                        if (isCollapsed) {
+                            sidebar.classList.add('w-20', 'sidebar-collapsed');
+                            sidebar.classList.remove('w-72');
+                            if (toggleIcon) toggleIcon.classList.replace('fa-indent', 'fa-outdent');
+                        } else {
+                            sidebar.classList.remove('w-20', 'sidebar-collapsed');
+                            sidebar.classList.add('w-72');
+                            if (toggleIcon) toggleIcon.classList.replace('fa-outdent', 'fa-indent');
+                        }
+                    }
+                }
+
+                if (desktopBtn) {
+                    desktopBtn.addEventListener('click', () => {
+                        isCollapsed = !isCollapsed;
+                        localStorage.setItem('sidebar-collapsed', isCollapsed);
+                        updateSidebarState();
+                    });
+                }
+
+                // Init Sidebar
+                updateSidebarState();
+                window.addEventListener('resize', updateSidebarState);
+
+                // 3. Theme Toggle
+                const headerThemeBtn = document.getElementById('headerThemeToggle');
+                const htmlEl = document.documentElement;
+
+                function updateThemeIcon() {
+                    const isDark = htmlEl.classList.contains('dark');
+                    const iconClass = isDark ? 'fas fa-sun' : 'fas fa-moon';
+                    if (headerThemeBtn) headerThemeBtn.querySelector('i').className = iconClass;
+                }
+
+                const themeCookie = document.cookie.split('; ').find(row => row.startsWith('theme='));
+                if (themeCookie && themeCookie.split('=')[1] === 'dark') {
+                    htmlEl.classList.add('dark');
+                }
+                updateThemeIcon();
+
+                if (headerThemeBtn) {
+                    headerThemeBtn.addEventListener('click', () => {
+                        const isDark = htmlEl.classList.contains('dark');
+                        if (isDark) {
+                            htmlEl.classList.remove('dark');
+                            document.cookie = "theme=light; path=/; max-age=31536000";
+                        } else {
+                            htmlEl.classList.add('dark');
+                            document.cookie = "theme=dark; path=/; max-age=31536000";
+                        }
+                        updateThemeIcon();
+                    });
+                }
             });
         </script>
 
-        <main class="p-6 lg:p-10">
+        <main class="p-4 md:p-8 lg:p-12 max-w-7xl mx-auto w-full font-sans">

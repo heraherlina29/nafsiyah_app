@@ -1,6 +1,15 @@
 <?php
 require_once __DIR__ . '/../koneksi.php';
-if (session_status() === PHP_SESSION_NONE) { session_start(); }
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Proteksi Halaman
+if (!isset($_SESSION['user_id'])) {
+    header('Location: ../login.php');
+    exit();
+}
+
 $id_user = $_SESSION['user_id'];
 
 // Ambil data profil terbaru
@@ -11,209 +20,178 @@ $user = $stmt->fetch();
 include 'templates/header.php';
 ?>
 
-<!-- Clean Minimalist Design -->
-<div class="min-h-screen bg-gradient-to-br from-gray-50 to-white p-4 md:p-8">
-    <div class="max-w-4xl mx-auto">
-        
-        <!-- Header -->
-        <div class="mb-10 text-center">
-            <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
-                PROFILE <span class="text-purple-600">SETTINGS</span>
-            </h1>
-            <p class="text-gray-600 max-w-md mx-auto">
-                Kelola informasi profil dan keamanan akun Anda
-            </p>
-        </div>
+<!-- Container Utama -->
+<div class="max-w-5xl mx-auto space-y-8 font-sans">
 
-        <!-- Success/Error Message -->
-        <?php if (isset($_GET['status'])): ?>
-        <div class="mb-6 max-w-2xl mx-auto animate-fadeIn">
-            <div class="p-4 rounded-lg border <?= $_GET['status'] == 'success' ? 'bg-green-50 border-green-200 text-green-700' : 'bg-red-50 border-red-200 text-red-700' ?>">
-                <div class="flex items-center">
-                    <?php if ($_GET['status'] == 'success'): ?>
-                        <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                        </svg>
-                    <?php else: ?>
-                        <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                        </svg>
-                    <?php endif; ?>
-                    <span class="font-medium"><?= htmlspecialchars($_GET['msg']) ?></span>
-                </div>
-            </div>
-        </div>
-        <?php endif; ?>
+    <!-- Page Header -->
+    <div class="text-center sm:text-left">
+        <h1 class="text-2xl font-black text-slate-800 dark:text-white">Pengaturan Profil</h1>
+        <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Kelola informasi akun dan keamanan Anda</p>
+    </div>
 
-        <!-- Profile Content -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-4xl mx-auto">
-            
-            <!-- Left Column - User Info -->
-            <div class="lg:col-span-1">
-                <!-- Profile Card -->
-                <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-                    <!-- Profile Header -->
-                    <div class="h-32 bg-gradient-to-r from-purple-600 to-indigo-600 relative">
-                        <div class="absolute -bottom-10 left-1/2 transform -translate-x-1/2">
-                            <div class="w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center text-2xl font-bold text-white shadow-xl border-4 border-white">
-                                <?= substr($user['nama_lengkap'], 0, 1) ?>
-                            </div>
-                        </div>
+    <!-- Alert Messages -->
+    <?php if (isset($_GET['status'])): ?>
+        <div
+            class="p-4 rounded-2xl border flex items-center gap-3 animate-bounce-in <?= $_GET['status'] == 'success' ? 'bg-green-50 border-green-200 text-green-700 dark:bg-green-900/20 dark:border-green-800' : 'bg-rose-50 border-rose-200 text-rose-700 dark:bg-rose-900/20 dark:border-rose-800' ?>">
+            <i class="fas <?= $_GET['status'] == 'success' ? 'fa-check-circle' : 'fa-exclamation-circle' ?> text-xl"></i>
+            <span class="font-bold text-sm"><?= htmlspecialchars($_GET['msg']) ?></span>
+        </div>
+    <?php endif; ?>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        <!-- Left Column: Identity Card -->
+        <div class="lg:col-span-1">
+            <div
+                class="bg-white rounded-3xl shadow-soft border border-slate-100 overflow-hidden dark:bg-dark-surface dark:border-dark-surface2 relative group">
+                <!-- Cover Decoration -->
+                <div class="h-32 bg-gradient-to-r from-primary-500 to-primary-600 relative overflow-hidden">
+                    <div class="absolute inset-0 opacity-20"
+                        style="background-image: radial-gradient(circle at 2px 2px, white 1px, transparent 0); background-size: 20px 20px;">
                     </div>
-                    
-                    <!-- Profile Content -->
-                    <div class="pt-12 pb-6 px-6 text-center">
-                        <h2 class="text-xl font-bold text-gray-900"><?= htmlspecialchars($user['nama_lengkap']) ?></h2>
-                        <p class="text-gray-600 text-sm mt-1">@<?= htmlspecialchars($user['username']) ?></p>
-                        
-                        <!-- Stats -->
-                        <div class="grid grid-cols-2 gap-4 mt-6">
-                            <div class="bg-gray-50 rounded-xl p-4">
-                                <div class="text-2xl font-bold text-gray-900"><?= $user['total_poin'] ?></div>
-                                <p class="text-xs text-gray-500 mt-1">Total Poin</p>
-                            </div>
-                            <div class="bg-gray-50 rounded-xl p-4">
-                                <div class="text-2xl font-bold text-gray-900"><?= $user['streak_harian'] ?></div>
-                                <p class="text-xs text-gray-500 mt-1">Day Streak</p>
-                            </div>
+                </div>
+
+                <!-- Avatar -->
+                <div class="absolute top-16 left-1/2 transform -translate-x-1/2">
+                    <div class="w-24 h-24 rounded-full p-1 bg-white dark:bg-dark-surface shadow-lg">
+                        <div
+                            class="w-full h-full rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-3xl font-black text-white uppercase select-none">
+                            <?= substr($user['nama_lengkap'], 0, 1) ?>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Right Column - Profile Details -->
-            <div class="lg:col-span-2">
-                <!-- Profile Information Card -->
-                <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-                    <!-- Card Header -->
-                    <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
-                        <h3 class="text-lg font-bold text-gray-900">
-                            <span class="text-purple-600">Hera Herlina</span>
-                        </h3>
-                        <p class="text-sm text-gray-600 mt-1">Informasi Profil</p>
-                    </div>
-                    
-                    <!-- Profile Fields -->
-                    <div class="p-6 space-y-6">
-                        <!-- Nama Lengkap -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                Nama Lengkap
-                            </label>
-                            <div class="p-4 bg-gray-50 rounded-xl border border-gray-200">
-                                <p class="text-gray-900 font-medium"><?= htmlspecialchars($user['nama_lengkap']) ?></p>
-                            </div>
+                <!-- Info -->
+                <div class="pt-14 pb-8 px-6 text-center mt-2">
+                    <h2 class="text-xl font-bold text-slate-800 dark:text-white">
+                        <?= htmlspecialchars($user['nama_lengkap']) ?></h2>
+                    <p class="text-sm font-medium text-primary-500">@<?= htmlspecialchars($user['username']) ?></p>
+
+                    <div class="grid grid-cols-2 gap-4 mt-8">
+                        <div
+                            class="p-3 rounded-2xl bg-slate-50 border border-slate-100 dark:bg-dark-surface2 dark:border-slate-700">
+                            <div class="text-xl font-black text-slate-800 dark:text-white">
+                                <?= number_format($user['total_poin']) ?></div>
+                            <div class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Total Poin</div>
                         </div>
-
-                        <!-- Username -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                Username
-                            </label>
-                            <div class="p-4 bg-gray-50 rounded-xl border border-gray-200">
-                                <p class="text-gray-900 font-medium"><?= htmlspecialchars($user['username']) ?></p>
-                            </div>
-                        </div>
-
-                        <!-- Email -->
-                        <?php if (!empty($user['email'])): ?>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                Email
-                            </label>
-                            <div class="p-4 bg-gray-50 rounded-xl border border-gray-200">
-                                <p class="text-gray-900 font-medium"><?= htmlspecialchars($user['email']) ?></p>
-                            </div>
-                        </div>
-                        <?php endif; ?>
-
-                        <!-- Divider -->
-                        <div class="pt-6">
-                            <!-- Single Button - Change Password -->
-                            <button onclick="document.getElementById('modalPW').classList.remove('hidden')"
-                                    class="w-full px-6 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold rounded-xl hover:shadow-lg hover:shadow-purple-200 transition-all duration-300 flex items-center justify-center gap-3 group">
-                                <svg class="w-5 h-5 group-hover:rotate-12 transition-transform" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
-                                </svg>
-                                Ubah Password
-                            </button>
+                        <div
+                            class="p-3 rounded-2xl bg-amber-50 border border-amber-100 dark:bg-amber-900/10 dark:border-amber-900/20">
+                            <!-- Menggunakan streak_count agar konsisten dengan header -->
+                            <div class="text-xl font-black text-amber-500"><?= $user['streak_count'] ?? 0 ?></div>
+                            <div
+                                class="text-[10px] uppercase font-bold text-amber-600/60 dark:text-amber-500/60 tracking-wider">
+                                Streak</div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Right Column: Edit Form -->
+        <div class="lg:col-span-2">
+            <div
+                class="bg-white rounded-3xl shadow-soft border border-slate-100 dark:bg-dark-surface dark:border-dark-surface2 overflow-hidden">
+                <div
+                    class="p-6 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center bg-slate-50/50 dark:bg-dark-surface2/50">
+                    <h3 class="font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                        <i class="fas fa-user-cog text-primary-500"></i> Detail Akun
+                    </h3>
+                </div>
+
+                <div class="p-6 md:p-8 space-y-6">
+                    <!-- Read Only Fields -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Nama
+                                Lengkap</label>
+                            <div
+                                class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-700 font-bold dark:bg-dark-surface2 dark:border-slate-700 dark:text-slate-300">
+                                <?= htmlspecialchars($user['nama_lengkap']) ?>
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Username</label>
+                            <div
+                                class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-700 font-bold dark:bg-dark-surface2 dark:border-slate-700 dark:text-slate-300">
+                                @<?= htmlspecialchars($user['username']) ?>
+                            </div>
+                        </div>
+                        <div class="md:col-span-2 space-y-2">
+                            <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Email</label>
+                            <div
+                                class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-700 font-bold dark:bg-dark-surface2 dark:border-slate-700 dark:text-slate-300">
+                                <?= !empty($user['email']) ? htmlspecialchars($user['email']) : '<span class="italic text-slate-400">Belum diatur</span>' ?>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-6 border-t border-slate-100 dark:border-slate-700">
+                        <button onclick="document.getElementById('modalPW').classList.remove('hidden')"
+                            class="w-full sm:w-auto px-6 py-3 bg-white border-2 border-primary-100 text-primary-600 font-bold rounded-xl hover:bg-primary-50 hover:border-primary-200 transition-all flex items-center justify-center gap-2 dark:bg-dark-surface2 dark:border-primary-900/30 dark:text-primary-400 dark:hover:bg-primary-900/20">
+                            <i class="fas fa-lock"></i> Ubah Password
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
 
 <!-- Modal Change Password -->
-<div id="modalPW" class="hidden fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md transform transition-all">
-        <!-- Modal Header -->
-        <div class="px-6 py-4 border-b border-gray-100">
-            <div class="flex justify-between items-center">
-                <div>
-                    <h3 class="text-xl font-bold text-gray-900">Ubah Password</h3>
-                    <p class="text-gray-500 text-sm">Masukkan password baru Anda</p>
-                </div>
-                <button onclick="document.getElementById('modalPW').classList.add('hidden')" 
-                        class="text-gray-400 hover:text-gray-600 transition-colors">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                    </svg>
-                </button>
+<div id="modalPW"
+    class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm transition-all duration-300">
+    <div
+        class="bg-white dark:bg-dark-surface w-full max-w-md rounded-3xl shadow-2xl overflow-hidden transform transition-all scale-100 border border-slate-100 dark:border-slate-700">
+        <div
+            class="p-6 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center bg-slate-50/50 dark:bg-dark-surface2/50">
+            <div>
+                <h3 class="font-bold text-lg text-slate-800 dark:text-white">Ganti Password</h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400">Amankan akun Anda secara berkala</p>
             </div>
+            <button onclick="document.getElementById('modalPW').classList.add('hidden')"
+                class="text-slate-400 hover:text-rose-500 transition-colors bg-white dark:bg-dark-surface2 p-2 rounded-full shadow-sm hover:shadow-md">
+                <i class="fas fa-times text-lg"></i>
+            </button>
         </div>
-        
-        <!-- Modal Form -->
-        <form action="update_password.php" method="POST" class="p-6">
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Password Lama</label>
-                    <input type="password" name="password_lama" 
-                           class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all"
-                           placeholder="••••••••" required>
-                </div>
 
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Password Baru</label>
-                    <input type="password" name="password_baru" 
-                           class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all"
-                           placeholder="••••••••" required>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Konfirmasi Password</label>
-                    <input type="password" name="konfirmasi_password" 
-                           class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all"
-                           placeholder="••••••••" required>
-                </div>
+        <form action="update_password.php" method="POST" class="p-6 space-y-4">
+            <div class="space-y-2">
+                <label class="text-xs font-bold text-slate-500 uppercase tracking-wider dark:text-slate-400">Password
+                    Lama</label>
+                <input type="password" name="password_lama" required
+                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-all dark:bg-dark-surface2 dark:border-slate-700 dark:text-white dark:focus:border-primary-500 dark:focus:ring-primary-900"
+                    placeholder="••••••••">
             </div>
 
-            <!-- Action Buttons -->
-            <div class="flex gap-3 pt-8">
-                <button type="button" 
-                        onclick="document.getElementById('modalPW').classList.add('hidden')"
-                        class="flex-1 px-4 py-3 border border-gray-300 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition-colors">
+            <div class="space-y-2">
+                <label class="text-xs font-bold text-slate-500 uppercase tracking-wider dark:text-slate-400">Password
+                    Baru</label>
+                <input type="password" name="password_baru" required
+                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-all dark:bg-dark-surface2 dark:border-slate-700 dark:text-white dark:focus:border-primary-500 dark:focus:ring-primary-900"
+                    placeholder="••••••••">
+            </div>
+
+            <div class="space-y-2">
+                <label class="text-xs font-bold text-slate-500 uppercase tracking-wider dark:text-slate-400">Konfirmasi
+                    Password</label>
+                <input type="password" name="konfirmasi_password" required
+                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-all dark:bg-dark-surface2 dark:border-slate-700 dark:text-white dark:focus:border-primary-500 dark:focus:ring-primary-900"
+                    placeholder="••••••••">
+            </div>
+
+            <div class="pt-4 flex gap-3">
+                <button type="button" onclick="document.getElementById('modalPW').classList.add('hidden')"
+                    class="flex-1 px-4 py-3 bg-slate-100 text-slate-600 font-bold rounded-xl hover:bg-slate-200 transition-all dark:bg-dark-surface2 dark:text-slate-400 dark:hover:bg-slate-700">
                     Batal
                 </button>
-                <button type="submit" 
-                        class="flex-1 px-4 py-3 bg-purple-600 text-white font-medium rounded-xl hover:bg-purple-700 transition-colors">
+                <button type="submit"
+                    class="flex-1 px-4 py-3 bg-primary-600 text-white font-bold rounded-xl hover:bg-primary-700 shadow-lg shadow-primary-500/30 hover:shadow-primary-500/50 transition-all transform hover:-translate-y-0.5">
                     Simpan
                 </button>
             </div>
         </form>
     </div>
 </div>
-
-<style>
-    .animate-fadeIn {
-        animation: fadeIn 0.3s ease-out;
-    }
-    
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(-10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-</style>
 
 <?php include 'templates/footer.php'; ?>
