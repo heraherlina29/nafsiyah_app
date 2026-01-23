@@ -1,7 +1,7 @@
 <?php
 // Konfigurasi database
 $host = "localhost";
-$db_name = "db_nafsiyah";
+$db_name = "nafsiyah_app";
 $username = "root"; // ganti kalau pakai user lain
 $password = "";
 

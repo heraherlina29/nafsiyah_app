@@ -36,59 +36,6 @@ $end_number = min($offset + $limit_per_halaman, $total_data);
         </button>
     </div>
 
-    <!-- Stats Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <!-- Total Amalan -->
-        <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-soft dark:bg-dark-surface dark:border-dark-surface2 flex items-center justify-between group hover:shadow-lg transition-all">
-            <div>
-                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Total Amalan</p>
-                <p class="text-2xl font-black text-slate-800 dark:text-white"><?= $total_data ?></p>
-            </div>
-            <div class="w-12 h-12 rounded-2xl bg-primary-50 flex items-center justify-center text-primary-600 dark:bg-primary-900/20 dark:text-primary-400 group-hover:scale-110 transition-transform">
-                <i class="fas fa-list-check text-xl"></i>
-            </div>
-        </div>
-
-        <!-- Urutan Tertinggi -->
-        <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-soft dark:bg-dark-surface dark:border-dark-surface2 flex items-center justify-between group hover:shadow-lg transition-all">
-            <div>
-                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Max Urutan</p>
-                <p class="text-2xl font-black text-slate-800 dark:text-white">
-                    <?= $items ? max(array_column($items, 'urutan')) : 0 ?>
-                </p>
-            </div>
-            <div class="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 dark:bg-blue-900/20 dark:text-blue-400 group-hover:scale-110 transition-transform">
-                <i class="fas fa-sort-numeric-up text-xl"></i>
-            </div>
-        </div>
-
-        <!-- Rata-rata Opsi -->
-        <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-soft dark:bg-dark-surface dark:border-dark-surface2 flex items-center justify-between group hover:shadow-lg transition-all">
-            <div>
-                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Avg. Opsi</p>
-                <p class="text-2xl font-black text-slate-800 dark:text-white">
-                    <?= $items ? round(array_reduce($items, function ($carry, $item) {
-                        return $carry + ($item['sub_komponen'] ? count(explode(',', $item['sub_komponen'])) : 0);
-                    }, 0) / count($items), 1) : 0 ?>
-                </p>
-            </div>
-            <div class="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400 group-hover:scale-110 transition-transform">
-                <i class="fas fa-sliders-h text-xl"></i>
-            </div>
-        </div>
-
-        <!-- Halaman -->
-        <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-soft dark:bg-dark-surface dark:border-dark-surface2 flex items-center justify-between group hover:shadow-lg transition-all">
-            <div>
-                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Halaman</p>
-                <p class="text-2xl font-black text-slate-800 dark:text-white"><?= $halaman_aktif ?> <span class="text-sm text-slate-400 font-medium">/ <?= $total_halaman ?></span></p>
-            </div>
-            <div class="w-12 h-12 rounded-2xl bg-amber-50 flex items-center justify-center text-amber-600 dark:bg-amber-900/20 dark:text-amber-400 group-hover:scale-110 transition-transform">
-                <i class="fas fa-layer-group text-xl"></i>
-            </div>
-        </div>
-    </div>
-
     <!-- Main Table -->
     <div class="bg-white rounded-3xl shadow-soft border border-slate-100 overflow-hidden dark:bg-dark-surface dark:border-dark-surface2">
         <div class="overflow-x-auto">

@@ -244,10 +244,10 @@ $streak_sidebar = $user_sidebar['streak_count'] ?? 0;
                 <!-- Teks Logo -->
                 <div class="logo-text overflow-hidden whitespace-nowrap transition-all duration-300">
                     <h1 class="text-xl font-extrabold text-slate-800 dark:text-white">
-                        Nafsiyah
+                        Nafsiyah App
                     </h1>
-                    <p class="text-[10px] font-semibold text-primary-500 tracking-widest uppercase">
-                        My Journey
+                    <p class="text-[10px] font-semibold text-primary-500 tracking-widest">
+                        Track Your Progress
                     </p>
                 </div>
             </div>
@@ -355,30 +355,33 @@ $streak_sidebar = $user_sidebar['streak_count'] ?? 0;
                 <span class="lg:hidden font-bold text-slate-800 dark:text-white text-lg font-sans">Nafsiyah</span>
             </div>
 
-            <div class="flex items-center gap-4 bg-white">
+            <div class="flex items-center gap-4">
                 <button id="headerThemeToggle"
                     class="w-9 h-9 rounded-full bg-white border border-slate-200 text-slate-500 flex items-center justify-center shadow-sm hover:text-primary-600 hover:shadow-md transition-all dark:bg-dark-surface dark:border-slate-700 dark:text-white">
                     <i class="fas fa-moon"></i>
                 </button>
 
-                <!-- Profile Info (Restored to Header) -->
                 <div class="h-8 w-[1px] bg-slate-200 dark:bg-slate-700 hidden sm:block"></div>
 
                 <div class="flex items-center gap-3 hidden sm:flex">
                     <div class="text-right">
-                        <p class="text-[10px] font-bold text-slate-400 uppercase leading-none mb-0.5 font-sans">
-                            Assalamu'alaikum,</p>
-                        <p class="text-sm font-bold text-slate-800 dark:text-white font-sans">
-                            <?php echo htmlspecialchars($nama_tampil); ?>
+                        <p
+                            class="text-[10px] font-bold text-slate-400 dark:text-slate-500 leading-none mb-0.5">
+                            Assalamu'alaikum,
+                        </p>
+                        <p class="text-sm font-bold text-slate-800 dark:text-white">
+                            <?= htmlspecialchars($nama_tampil); ?>
                         </p>
                     </div>
+
                     <div
                         class="w-9 h-9 rounded-full bg-primary-100 p-0.5 border border-primary-200 dark:bg-primary-900/30 dark:border-primary-800">
-                        <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($nama_tampil); ?>&background=8B5CF6&color=fff&bold=true"
+                        <img src="https://ui-avatars.com/api/?name=<?= urlencode($nama_tampil); ?>&background=8B5CF6&color=fff&bold=true"
                             class="w-full h-full rounded-full object-cover" alt="User">
                     </div>
                 </div>
             </div>
+
         </header>
 
         <!-- Script Logic -->
