@@ -1,6 +1,5 @@
 <?php
 session_start();
-// Menggunakan nama file koneksi yang sudah Anda ubah
 require_once __DIR__ . '/../koneksi.php';
 
 header('Content-Type: application/json');
@@ -17,6 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     // --- AKSI TAMBAH ---
     if ($_POST['action'] === 'tambah') {
         $username = $_POST['username'];
+        $no_wa = $_POST['no_wa']; // <-- Ambil data WA
         $password = $_POST['password'];
 
         if (empty($username) || empty($password)) {
@@ -24,8 +24,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         } else {
             $hashed_password = password_hash($password, PASSWORD_DEFAULT);
             try {
-                $stmt = $pdo->prepare("INSERT INTO admins (username, password) VALUES (?, ?)");
-                $stmt->execute([$username, $hashed_password]);
+                // Tambahkan no_wa ke query INSERT
+                $stmt = $pdo->prepare("INSERT INTO admins (username, no_wa, password) VALUES (?, ?, ?)");
+                $stmt->execute([$username, $no_wa, $hashed_password]);
                 $response = ['status' => 'success', 'message' => "Admin '{$username}' berhasil ditambahkan."];
             } catch (PDOException $e) {
                 if ($e->getCode() == 23000) {
@@ -41,6 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     elseif ($_POST['action'] === 'edit') {
         $id = $_POST['id'];
         $username = $_POST['username'];
+        $no_wa = $_POST['no_wa']; // <-- Ambil data WA
         $password = $_POST['password'];
 
         if (empty($username) || empty($id)) {
@@ -49,11 +51,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             try {
                 if (!empty($password)) {
                     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-                    $stmt = $pdo->prepare("UPDATE admins SET username = ?, password = ? WHERE id = ?");
-                    $stmt->execute([$username, $hashed_password, $id]);
+                    // Update dengan no_wa dan password
+                    $stmt = $pdo->prepare("UPDATE admins SET username = ?, no_wa = ?, password = ? WHERE id = ?");
+                    $stmt->execute([$username, $no_wa, $hashed_password, $id]);
                 } else {
-                    $stmt = $pdo->prepare("UPDATE admins SET username = ? WHERE id = ?");
-                    $stmt->execute([$username, $id]);
+                    // Update dengan no_wa saja
+                    $stmt = $pdo->prepare("UPDATE admins SET username = ?, no_wa = ? WHERE id = ?");
+                    $stmt->execute([$username, $no_wa, $id]);
                 }
                 $response = ['status' => 'success', 'message' => "Data admin '{$username}' berhasil diperbarui."];
             } catch (PDOException $e) {
@@ -72,7 +76,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         if (empty($id)) {
             $response['message'] = 'ID Admin tidak valid.';
         } elseif ($id == $_SESSION['user_id']) {
-            // Proteksi agar admin tidak bisa menghapus dirinya sendiri
             $response['message'] = 'Anda tidak bisa menghapus akun Anda sendiri.';
         } else {
             try {

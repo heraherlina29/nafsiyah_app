@@ -159,7 +159,7 @@ require_once __DIR__ . '/templates/header.php';
                         class="p-2 bg-primary-100 rounded-lg text-primary-600 dark:bg-primary-900/20 dark:text-primary-400">
                         <i class="fas fa-chart-simple"></i>
                     </div>
-                    Progress Spiritual
+                    Progress Nafsiyah
                 </h2>
 
                 <div class="flex items-end justify-between mb-2">

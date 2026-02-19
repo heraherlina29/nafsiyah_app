@@ -16,7 +16,8 @@ $where_clauses = [];
 $params = [];
 
 if (!empty($search_query)) {
-    $where_clauses[] = "(nama_lengkap LIKE ? OR username LIKE ? OR email LIKE ?)";
+    $where_clauses[] = "(nama_lengkap LIKE ? OR username LIKE ? OR email LIKE ? OR no_wa LIKE ?)";
+    $params[] = "%$search_query%";
     $params[] = "%$search_query%";
     $params[] = "%$search_query%";
     $params[] = "%$search_query%";
@@ -37,7 +38,7 @@ $total_data = $stmt_total->fetchColumn();
 $total_halaman = ceil($total_data / $limit_per_halaman);
 
 // --- 3. QUERY UTAMA AMBIL DATA ---
-$data_sql = "SELECT id, nama_lengkap, email, username, status, created_at " . $base_sql . " ORDER BY created_at DESC LIMIT ? OFFSET ?";
+$data_sql = "SELECT id, nama_lengkap, email, no_wa, username, status, created_at " . $base_sql . " ORDER BY created_at DESC LIMIT ? OFFSET ?";
 $params[] = $limit_per_halaman;
 $params[] = $offset;
 
@@ -54,7 +55,6 @@ $end_number = min($offset + $limit_per_halaman, $total_data);
 
 <div class="max-w-7xl mx-auto space-y-8 font-sans">
 
-    <!-- Page Header -->
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
             <h1 class="text-2xl font-black text-slate-800 dark:text-white">Kelola Pengguna</h1>
@@ -66,7 +66,6 @@ $end_number = min($offset + $limit_per_halaman, $total_data);
         </button>
     </div>
 
-    <!-- Filter Section -->
     <div
         class="bg-white rounded-3xl p-6 shadow-soft border border-slate-100 dark:bg-dark-surface dark:border-dark-surface2">
         <form action="user.php" method="GET" class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
@@ -75,7 +74,7 @@ $end_number = min($offset + $limit_per_halaman, $total_data);
                     class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 dark:text-slate-400">Pencarian</label>
                 <div class="relative">
                     <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                    <input type="text" name="search" placeholder="Nama, email, atau username..."
+                    <input type="text" name="search" placeholder="Nama, email, username, atau WA..."
                         value="<?= htmlspecialchars($search_query) ?>"
                         class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-all dark:bg-dark-surface2 dark:border-slate-700 dark:text-white dark:focus:ring-primary-900">
                 </div>
@@ -106,7 +105,6 @@ $end_number = min($offset + $limit_per_halaman, $total_data);
         </form>
     </div>
 
-    <!-- Data Table -->
     <div
         class="bg-white rounded-3xl shadow-soft border border-slate-100 overflow-hidden dark:bg-dark-surface dark:border-dark-surface2">
         <div class="overflow-x-auto">
@@ -117,6 +115,7 @@ $end_number = min($offset + $limit_per_halaman, $total_data);
                         <th class="px-6 py-4">Pengguna</th>
                         <th class="px-6 py-4 text-center">Status</th>
                         <th class="px-6 py-4">Username</th>
+                        <th class="px-6 py-4">Informasi Kontak</th>
                         <th class="px-6 py-4">Bergabung</th>
                         <th class="px-6 py-4 text-right">Aksi</th>
                     </tr>
@@ -124,7 +123,7 @@ $end_number = min($offset + $limit_per_halaman, $total_data);
                 <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
                     <?php if (empty($users)): ?>
                         <tr>
-                            <td colspan="5" class="px-6 py-12 text-center">
+                            <td colspan="6" class="px-6 py-12 text-center">
                                 <div class="flex flex-col items-center justify-center">
                                     <div
                                         class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center text-slate-300 mb-4 dark:bg-dark-surface2 dark:text-slate-600">
@@ -149,7 +148,8 @@ $end_number = min($offset + $limit_per_halaman, $total_data);
                                         <div>
                                             <p
                                                 class="font-bold text-slate-800 dark:text-white group-hover:text-primary-600 transition-colors">
-                                                <?= htmlspecialchars($user['nama_lengkap']) ?></p>
+                                                <?= htmlspecialchars($user['nama_lengkap']) ?>
+                                            </p>
                                             <p class="text-[10px] text-slate-400"><?= htmlspecialchars($user['email']) ?></p>
                                         </div>
                                     </div>
@@ -170,31 +170,41 @@ $end_number = min($offset + $limit_per_halaman, $total_data);
                                 <td class="px-6 py-4 font-medium text-slate-700 dark:text-slate-300">
                                     @<?= htmlspecialchars($user['username']) ?>
                                 </td>
+                                <td class="px-6 py-4">
+                                    <div class="text-sm font-medium text-slate-800 dark:text-white">
+                                        <?= htmlspecialchars($user['email']) ?>
+                                    </div>
+                                    <div class="text-xs text-slate-500 flex items-center gap-1">
+                                        <i class="fab fa-whatsapp text-green-500"></i>
+                                        <?= htmlspecialchars($user['no_wa'] ?: '-') ?>
+                                    </div>
+                                </td>
                                 <td class="px-6 py-4 text-xs text-slate-500 dark:text-slate-400">
                                     <?= date('d M Y', strtotime($user['created_at'])) ?>
                                 </td>
                                 <td class="px-6 py-4 text-right">
                                     <div class="flex items-center justify-end gap-2">
-                                        <!-- Tombol Lihat Detail (Ikon Mata) -->
                                         <a href="user_detail.php?id=<?= $user['id'] ?>"
                                             class="w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-slate-200 text-slate-500 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-all shadow-sm dark:bg-dark-surface2 dark:border-slate-700 dark:text-slate-400 dark:hover:text-blue-400"
                                             title="Lihat Detail">
                                             <i class="fas fa-eye text-xs"></i>
                                         </a>
 
-                                        <!-- Tombol Edit -->
                                         <button type="button"
                                             class="w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-slate-200 text-slate-500 hover:bg-primary-50 hover:text-primary-600 hover:border-primary-200 transition-all shadow-sm edit-btn dark:bg-dark-surface2 dark:border-slate-700 dark:text-slate-400 dark:hover:text-primary-400"
-                                            data-id="<?= $user['id'] ?>" data-nama="<?= $user['nama_lengkap'] ?>"
-                                            data-email="<?= $user['email'] ?>" data-username="<?= $user['username'] ?>"
+                                            data-id="<?= $user['id'] ?>"
+                                            data-nama="<?= htmlspecialchars($user['nama_lengkap']) ?>"
+                                            data-email="<?= htmlspecialchars($user['email']) ?>"
+                                            data-no_wa="<?= htmlspecialchars($user['no_wa']) ?>"
+                                            data-username="<?= htmlspecialchars($user['username']) ?>"
                                             data-status="<?= $user['status'] ?>" title="Edit">
                                             <i class="fas fa-pen text-xs"></i>
                                         </button>
 
-                                        <!-- Tombol Hapus -->
                                         <button type="button"
                                             class="w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-slate-200 text-slate-500 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 transition-all shadow-sm hapus-btn dark:bg-dark-surface2 dark:border-slate-700 dark:text-slate-400 dark:hover:text-rose-400"
-                                            data-id="<?= $user['id'] ?>" data-nama="<?= $user['nama_lengkap'] ?>" title="Hapus">
+                                            data-id="<?= $user['id'] ?>"
+                                            data-nama="<?= htmlspecialchars($user['nama_lengkap']) ?>" title="Hapus">
                                             <i class="fas fa-trash text-xs"></i>
                                         </button>
                                     </div>
@@ -206,7 +216,6 @@ $end_number = min($offset + $limit_per_halaman, $total_data);
             </table>
         </div>
 
-        <!-- Pagination Footer -->
         <div
             class="p-4 border-t border-slate-100 bg-slate-50 dark:bg-dark-surface2 dark:border-slate-700 flex flex-col md:flex-row justify-between items-center gap-4">
             <p class="text-xs text-slate-500 font-medium dark:text-slate-400">
@@ -229,13 +238,11 @@ $end_number = min($offset + $limit_per_halaman, $total_data);
     </div>
 </div>
 
-<!-- Modal Form -->
 <div id="dataModal"
     class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300">
     <div class="bg-white rounded-3xl w-full max-w-md shadow-2xl transform scale-95 transition-transform duration-300 overflow-hidden dark:bg-dark-surface border border-slate-100 dark:border-slate-700"
         id="modalContent">
 
-        <!-- Modal Header -->
         <div
             class="px-6 py-5 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center bg-slate-50/50 dark:bg-dark-surface2/50">
             <div>
@@ -248,7 +255,7 @@ $end_number = min($offset + $limit_per_halaman, $total_data);
             </button>
         </div>
 
-        <form id="dataForm" class="p-6 space-y-5">
+        <form id="dataForm" class="p-6 space-y-5 overflow-y-auto max-h-[75vh] custom-scrollbar">
             <input type="hidden" name="action" id="formAction" value="tambah">
             <input type="hidden" name="id" id="dataId">
 
@@ -258,6 +265,19 @@ $end_number = min($offset + $limit_per_halaman, $total_data);
                 <input type="text" name="nama_lengkap" id="nama_lengkap" required
                     class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-all dark:bg-dark-surface2 dark:border-slate-700 dark:text-white dark:focus:ring-primary-900"
                     placeholder="Contoh: Ahmad Fulani">
+            </div>
+
+            <div class="space-y-2">
+                <label class="text-xs font-bold text-slate-500 uppercase tracking-wider dark:text-slate-400">Nomor
+                    WhatsApp</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400">
+                        <i class="fab fa-whatsapp text-lg"></i>
+                    </span>
+                    <input type="text" name="no_wa" id="no_wa"
+                        class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-primary-500 transition-all dark:bg-dark-surface2 dark:border-slate-700 dark:text-white dark:focus:ring-primary-900"
+                        placeholder="628123xxx">
+                </div>
             </div>
 
             <div class="space-y-2">
@@ -318,9 +338,27 @@ $end_number = min($offset + $limit_per_halaman, $total_data);
     </div>
 </div>
 
+<style>
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 5px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #e2e8f0;
+        border-radius: 10px;
+    }
+
+    .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #334155;
+    }
+</style>
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    // Toggle Password Visibility
     function togglePassword() {
         const input = document.getElementById('password');
         const icon = document.getElementById('toggleIcon');
@@ -344,7 +382,6 @@ $end_number = min($offset + $limit_per_halaman, $total_data);
 
         const showModal = () => {
             modal.classList.remove('hidden');
-            // Small delay to allow display:block to apply before opacity transition
             setTimeout(() => {
                 modal.classList.remove('opacity-0');
                 modalContent.classList.remove('scale-95');
@@ -382,6 +419,7 @@ $end_number = min($offset + $limit_per_halaman, $total_data);
                 document.getElementById('dataId').value = d.id;
                 document.getElementById('nama_lengkap').value = d.nama;
                 document.getElementById('email').value = d.email;
+                document.getElementById('no_wa').value = d.no_wa; // Field WA
                 document.getElementById('username').value = d.username;
                 document.getElementById('status_user').value = d.status;
 
@@ -396,81 +434,6 @@ $end_number = min($offset + $limit_per_halaman, $total_data);
         cancelModalBtn.addEventListener('click', hideModal);
         modal.addEventListener('click', (e) => { if (e.target === modal) hideModal(); });
 
-        // Handle Delete
-        document.querySelectorAll('.hapus-btn').forEach(btn => {
-            btn.addEventListener('click', function () {
-                const id = this.dataset.id;
-                const nama = this.dataset.nama;
-
-                Swal.fire({
-                    title: 'Hapus Pengguna?',
-                    html: `<p class="text-slate-600 dark:text-slate-400">Anda akan menghapus data:</p>
-                       <p class="font-bold text-lg text-slate-800 dark:text-white mt-1 mb-2">${nama}</p>
-                       <p class="text-xs text-rose-500">Tindakan ini tidak dapat dibatalkan!</p>`,
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#F43F5E', // Rose-500
-                    cancelButtonColor: '#94A3B8', // Slate-400
-                    confirmButtonText: 'Ya, Hapus',
-                    cancelButtonText: 'Batal',
-                    background: document.documentElement.classList.contains('dark') ? '#1E293B' : '#fff',
-                    color: document.documentElement.classList.contains('dark') ? '#fff' : '#1e293b',
-                    customClass: {
-                        popup: 'rounded-3xl',
-                        confirmButton: 'rounded-xl px-6 py-2.5 font-bold',
-                        cancelButton: 'rounded-xl px-6 py-2.5 font-bold'
-                    }
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        Swal.fire({
-                            title: 'Memproses...',
-                            text: 'Mohon tunggu sebentar',
-                            allowOutsideClick: false,
-                            didOpen: () => { Swal.showLoading(); },
-                            background: document.documentElement.classList.contains('dark') ? '#1E293B' : '#fff',
-                            color: document.documentElement.classList.contains('dark') ? '#fff' : '#1e293b',
-                            customClass: { popup: 'rounded-3xl' }
-                        });
-
-                        const fd = new FormData();
-                        fd.append('action', 'hapus');
-                        fd.append('id', id);
-
-                        fetch('user_api.php', { method: 'POST', body: fd })
-                            .then(res => res.json())
-                            .then(data => {
-                                if (data.status === 'success') {
-                                    Swal.fire({
-                                        title: 'Berhasil!',
-                                        text: 'Data pengguna berhasil dihapus.',
-                                        icon: 'success',
-                                        confirmButtonColor: '#8B5CF6',
-                                        confirmButtonText: 'OK',
-                                        background: document.documentElement.classList.contains('dark') ? '#1E293B' : '#fff',
-                                        color: document.documentElement.classList.contains('dark') ? '#fff' : '#1e293b',
-                                        customClass: { popup: 'rounded-3xl', confirmButton: 'rounded-xl font-bold' }
-                                    }).then(() => location.reload());
-                                } else {
-                                    throw new Error(data.message);
-                                }
-                            })
-                            .catch(err => {
-                                Swal.fire({
-                                    title: 'Gagal!',
-                                    text: err.message || 'Terjadi kesalahan server.',
-                                    icon: 'error',
-                                    confirmButtonColor: '#8B5CF6',
-                                    background: document.documentElement.classList.contains('dark') ? '#1E293B' : '#fff',
-                                    color: document.documentElement.classList.contains('dark') ? '#fff' : '#1e293b',
-                                    customClass: { popup: 'rounded-3xl', confirmButton: 'rounded-xl font-bold' }
-                                });
-                            });
-                    }
-                });
-            });
-        });
-
-        // Handle Submit Form
         form.addEventListener('submit', function (e) {
             e.preventDefault();
             const fd = new FormData(this);
@@ -515,6 +478,51 @@ $end_number = min($offset + $limit_per_halaman, $total_data);
                         customClass: { popup: 'rounded-3xl', confirmButton: 'rounded-xl font-bold' }
                     });
                 });
+        });
+
+        // Handle Delete
+        document.querySelectorAll('.hapus-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const id = this.dataset.id;
+                const nama = this.dataset.nama;
+
+                Swal.fire({
+                    title: 'Hapus Pengguna?',
+                    html: `<p class="text-slate-600 dark:text-slate-400">Anda akan menghapus data:</p>
+                           <p class="font-bold text-lg text-slate-800 dark:text-white mt-1 mb-2">${nama}</p>
+                           <p class="text-xs text-rose-500">Tindakan ini tidak dapat dibatalkan!</p>`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#F43F5E',
+                    cancelButtonColor: '#94A3B8',
+                    confirmButtonText: 'Ya, Hapus',
+                    cancelButtonText: 'Batal',
+                    background: document.documentElement.classList.contains('dark') ? '#1E293B' : '#fff',
+                    color: document.documentElement.classList.contains('dark') ? '#fff' : '#1e293b',
+                    customClass: {
+                        popup: 'rounded-3xl',
+                        confirmButton: 'rounded-xl px-6 py-2.5 font-bold',
+                        cancelButton: 'rounded-xl px-6 py-2.5 font-bold'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const fd = new FormData();
+                        fd.append('action', 'hapus');
+                        fd.append('id', id);
+
+                        fetch('user_api.php', { method: 'POST', body: fd })
+                            .then(res => res.json())
+                            .then(data => {
+                                if (data.status === 'success') {
+                                    Swal.fire('Berhasil!', 'Data pengguna dihapus.', 'success').then(() => location.reload());
+                                } else {
+                                    throw new Error(data.message);
+                                }
+                            })
+                            .catch(err => Swal.fire('Gagal!', err.message, 'error'));
+                    }
+                });
+            });
         });
     });
 </script>

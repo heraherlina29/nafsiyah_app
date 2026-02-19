@@ -53,25 +53,40 @@ include 'templates/header.php';
 
                 <!-- Avatar -->
                 <div class="absolute top-16 left-1/2 transform -translate-x-1/2">
-                    <div class="w-24 h-24 rounded-full p-1 bg-white dark:bg-dark-surface shadow-lg">
+                    <div class="relative group/avatar cursor-pointer"
+                        onclick="document.getElementById('inputFoto').click()">
+                        <div class="w-24 h-24 rounded-full p-1 bg-white dark:bg-dark-surface shadow-lg overflow-hidden">
+                            <?php if (!empty($user['profile_pic']) && file_exists('../uploads/profile/' . $user['profile_pic'])): ?>
+                                <img src="../uploads/profile/<?= $user['profile_pic'] ?>"
+                                    class="w-full h-full rounded-full object-cover">
+                            <?php else: ?>
+                                <div
+                                    class="w-full h-full rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-3xl font-black text-white uppercase">
+                                    <?= substr($user['nama_lengkap'], 0, 1) ?>
+                                </div>
+                            <?php endif; ?>
+                        </div>
                         <div
-                            class="w-full h-full rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-3xl font-black text-white uppercase select-none">
-                            <?= substr($user['nama_lengkap'], 0, 1) ?>
+                            class="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover/avatar:opacity-100 transition-opacity">
+                            <i class="fas fa-camera text-white"></i>
                         </div>
                     </div>
+                    <input type="file" id="inputFoto" class="hidden" accept="image/*" onchange="uploadFoto()">
                 </div>
 
                 <!-- Info -->
                 <div class="pt-14 pb-8 px-6 text-center mt-2">
                     <h2 class="text-xl font-bold text-slate-800 dark:text-white">
-                        <?= htmlspecialchars($user['nama_lengkap']) ?></h2>
+                        <?= htmlspecialchars($user['nama_lengkap']) ?>
+                    </h2>
                     <p class="text-sm font-medium text-primary-500">@<?= htmlspecialchars($user['username']) ?></p>
 
                     <div class="grid grid-cols-2 gap-4 mt-8">
                         <div
                             class="p-3 rounded-2xl bg-slate-50 border border-slate-100 dark:bg-dark-surface2 dark:border-slate-700">
                             <div class="text-xl font-black text-slate-800 dark:text-white">
-                                <?= number_format($user['total_poin']) ?></div>
+                                <?= number_format($user['total_poin']) ?>
+                            </div>
                             <div class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Total Poin</div>
                         </div>
                         <div
@@ -193,5 +208,40 @@ include 'templates/header.php';
         </form>
     </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    function uploadFoto() {
+        const input = document.getElementById('inputFoto');
+        if (input.files.length === 0) return;
+
+        const formData = new FormData();
+        formData.append('profile_pic', input.files[0]);
+
+        // Tampilkan Loading
+        Swal.fire({
+            title: 'Mengunggah...',
+            allowOutsideClick: false,
+            didOpen: () => { Swal.showLoading(); }
+        });
+
+        fetch('profile_api.php', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    Swal.fire('Berhasil!', data.message, 'success').then(() => {
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire('Gagal!', data.message, 'error');
+                }
+            })
+            .catch(error => {
+                Swal.fire('Error!', 'Terjadi kesalahan koneksi.', 'error');
+            });
+    }
+</script>
 
 <?php include 'templates/footer.php'; ?>
